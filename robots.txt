@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://foxi-yiyi.github.io/sitemap.xml
