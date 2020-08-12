@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>[English] Creating a New Theme - Moeah&#39;s BLOG - (っ•̀ω•́)っ✎ </title>
+  <title>[English] Creating a New Theme - Even - A super concise theme for Hugo</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -35,7 +35,8 @@ We&amp;rsquo;ll start with creating a new site with a very basic template." /><m
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -73,7 +74,7 @@ We&rsquo;ll start with creating a new site with a very basic template."/>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">Moeah</a>
+    <a href="/" class="logo">Even</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -99,7 +100,7 @@ We&rsquo;ll start with creating a new site with a very basic template."/>
   <div class="container" id="mobile-panel">
     <header id="header" class="header">
         <div class="logo-wrapper">
-  <a href="/" class="logo">Moeah</a>
+  <a href="/" class="logo">Even</a>
 </div>
 
 <nav class="site-navbar">
@@ -141,60 +142,64 @@ We&rsquo;ll start with creating a new site with a very basic template."/>
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#introduction">Introduction</a></li>
-    <li><a href="#some-definitions">Some Definitions</a>
+    <li>
       <ul>
-        <li><a href="#skins">Skins</a></li>
-        <li><a href="#the-home-page">The Home Page</a></li>
-        <li><a href="#site-configuration-file">Site Configuration File</a></li>
-        <li><a href="#content">Content</a></li>
-        <li><a href="#template-files">Template Files</a></li>
-      </ul>
-    </li>
-    <li><a href="#create-a-new-site">Create a New Site</a>
-      <ul>
-        <li><a href="#generate-the-html-for-the-new-site">Generate the HTML For the New Site</a></li>
-        <li><a href="#test-the-new-site">Test the New Site</a></li>
-      </ul>
-    </li>
-    <li><a href="#create-a-new-theme">Create a New Theme</a>
-      <ul>
-        <li><a href="#create-a-skeleton">Create a Skeleton</a></li>
-        <li><a href="#update-the-configuration-file-to-use-the-theme">Update the Configuration File to Use the Theme</a></li>
-        <li><a href="#generate-the-site">Generate the Site</a></li>
-      </ul>
-    </li>
-    <li><a href="#the-theme-development-cycle">The Theme Development Cycle</a>
-      <ul>
-        <li><a href="#purge-the-public-directory">Purge the public/ Directory</a></li>
-        <li><a href="#hugos-watch-option">Hugo&rsquo;s Watch Option</a></li>
-        <li><a href="#live-reload">Live Reload</a></li>
-        <li><a href="#development-commands">Development Commands</a></li>
-      </ul>
-    </li>
-    <li><a href="#update-the-home-page-template">Update the Home Page Template</a>
-      <ul>
-        <li><a href="#make-a-static-home-page">Make a Static Home Page</a></li>
-        <li><a href="#build-a-dynamic-home-page">Build a &ldquo;Dynamic&rdquo; Home Page</a></li>
-        <li><a href="#list-and-single-templates">List and Single Templates</a></li>
-        <li><a href="#add-content-to-the-homepage">Add Content to the Homepage</a></li>
-        <li><a href="#add-content-to-the-posts">Add Content to the Posts</a></li>
-        <li><a href="#linking-to-content">Linking to Content</a></li>
-        <li><a href="#create-a-post-listing">Create a Post Listing</a></li>
-      </ul>
-    </li>
-    <li><a href="#creating-top-level-pages">Creating Top Level Pages</a></li>
-    <li><a href="#sharing-templates">Sharing Templates</a>
-      <ul>
-        <li><a href="#create-the-header-and-footer-partials">Create the Header and Footer Partials</a></li>
-        <li><a href="#update-the-home-page-template-to-use-the-partials">Update the Home Page Template to Use the Partials</a></li>
-        <li><a href="#update-the-default-single-template-to-use-the-partials">Update the Default Single Template to Use the Partials</a></li>
-      </ul>
-    </li>
-    <li><a href="#add-date-published-to-posts">Add “Date Published” to Posts</a>
-      <ul>
-        <li><a href="#add-date-published-to-the-template">Add “Date Published” to the Template</a></li>
-        <li><a href="#dont-repeat-yourself">Don&rsquo;t Repeat Yourself</a></li>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#some-definitions">Some Definitions</a>
+          <ul>
+            <li><a href="#skins">Skins</a></li>
+            <li><a href="#the-home-page">The Home Page</a></li>
+            <li><a href="#site-configuration-file">Site Configuration File</a></li>
+            <li><a href="#content">Content</a></li>
+            <li><a href="#template-files">Template Files</a></li>
+          </ul>
+        </li>
+        <li><a href="#create-a-new-site">Create a New Site</a>
+          <ul>
+            <li><a href="#generate-the-html-for-the-new-site">Generate the HTML For the New Site</a></li>
+            <li><a href="#test-the-new-site">Test the New Site</a></li>
+          </ul>
+        </li>
+        <li><a href="#create-a-new-theme">Create a New Theme</a>
+          <ul>
+            <li><a href="#create-a-skeleton">Create a Skeleton</a></li>
+            <li><a href="#update-the-configuration-file-to-use-the-theme">Update the Configuration File to Use the Theme</a></li>
+            <li><a href="#generate-the-site">Generate the Site</a></li>
+          </ul>
+        </li>
+        <li><a href="#the-theme-development-cycle">The Theme Development Cycle</a>
+          <ul>
+            <li><a href="#purge-the-public-directory">Purge the public/ Directory</a></li>
+            <li><a href="#hugos-watch-option">Hugo&rsquo;s Watch Option</a></li>
+            <li><a href="#live-reload">Live Reload</a></li>
+            <li><a href="#development-commands">Development Commands</a></li>
+          </ul>
+        </li>
+        <li><a href="#update-the-home-page-template">Update the Home Page Template</a>
+          <ul>
+            <li><a href="#make-a-static-home-page">Make a Static Home Page</a></li>
+            <li><a href="#build-a-dynamic-home-page">Build a &ldquo;Dynamic&rdquo; Home Page</a></li>
+            <li><a href="#list-and-single-templates">List and Single Templates</a></li>
+            <li><a href="#add-content-to-the-homepage">Add Content to the Homepage</a></li>
+            <li><a href="#add-content-to-the-posts">Add Content to the Posts</a></li>
+            <li><a href="#linking-to-content">Linking to Content</a></li>
+            <li><a href="#create-a-post-listing">Create a Post Listing</a></li>
+          </ul>
+        </li>
+        <li><a href="#creating-top-level-pages">Creating Top Level Pages</a></li>
+        <li><a href="#sharing-templates">Sharing Templates</a>
+          <ul>
+            <li><a href="#create-the-header-and-footer-partials">Create the Header and Footer Partials</a></li>
+            <li><a href="#update-the-home-page-template-to-use-the-partials">Update the Home Page Template to Use the Partials</a></li>
+            <li><a href="#update-the-default-single-template-to-use-the-partials">Update the Default Single Template to Use the Partials</a></li>
+          </ul>
+        </li>
+        <li><a href="#add-date-published-to-posts">Add “Date Published” to Posts</a>
+          <ul>
+            <li><a href="#add-date-published-to-the-template">Add “Date Published” to the Template</a></li>
+            <li><a href="#dont-repeat-yourself">Don&rsquo;t Repeat Yourself</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
   </ul>
@@ -1954,20 +1959,20 @@ $ vi themes/zafta/layouts/_default/single.html
     <footer id="footer" class="footer">
       <div class="social-links">
       <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-google" title="google"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-github" title="github"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-douban" title="douban"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="https://foxi-yiyi.github.io/" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
   <a href="https://foxi-yiyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -1990,7 +1995,7 @@ $ vi themes/zafta/layouts/_default/single.html
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
-    <span class="author">Moeah</span>
+    <span class="author">olOwOlo</span>
   </span>
 </div>
     </footer>
@@ -2003,7 +2008,10 @@ $ vi themes/zafta/layouts/_default/single.html
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
 
 
 
