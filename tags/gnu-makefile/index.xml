@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GNU Makefile on Moeah&#39;s BLOG</title>
+    <link>https://foxi-yiyi.github.io/tags/gnu-makefile/</link>
+    <description>Recent content in GNU Makefile on Moeah&#39;s BLOG</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0800</lastBuildDate>
+    
+	<atom:link href="https://foxi-yiyi.github.io/tags/gnu-makefile/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GUN Make 项目管理</title>
+      <link>https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</link>
+      <pubDate>Fri, 28 Aug 2020 00:00:00 +0800</pubDate>
+      
+      <guid>https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</guid>
+      <description>第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp</description>
+    </item>
+    
+  </channel>
+</rss>

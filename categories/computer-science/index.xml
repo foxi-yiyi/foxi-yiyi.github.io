@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Computer Science on Moeah&#39;s BLOG</title>
+    <link>https://foxi-yiyi.github.io/categories/computer-science/</link>
+    <description>Recent content in Computer Science on Moeah&#39;s BLOG</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0800</lastBuildDate>
+    
+	<atom:link href="https://foxi-yiyi.github.io/categories/computer-science/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GUN Make 项目管理</title>
+      <link>https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</link>
+      <pubDate>Fri, 28 Aug 2020 00:00:00 +0800</pubDate>
+      
+      <guid>https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</guid>
+      <description>第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp</description>
+    </item>
+    
+    <item>
+      <title>C语言：什么是指针，自己的小理解</title>
+      <link>https://foxi-yiyi.github.io/post/c%E8%AF%AD%E8%A8%80%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0800</pubDate>
+      
+      <guid>https://foxi-yiyi.github.io/post/c%E8%AF%AD%E8%A8%80%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88/</guid>
+      <description>什么是指向XXX？ 首先C语言中存在多种数据类型，int，double，float或struct等。计算机使用内存来保存运算过程中某些必要的具</description>
+    </item>
+    
+    <item>
+      <title>操作系统：进程的概念</title>
+      <link>https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F01%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%A6%82%E5%BF%B5/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0800</pubDate>
+      
+      <guid>https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F01%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%A6%82%E5%BF%B5/</guid>
+      <description>操作系统——01：进程的概念 设计操作系统的目的是什么？ 对于某个程序来说，一定会同时需要CPU和IO同时操作，有时候会出现CPU的利用率不高的</description>
+    </item>
+    
+  </channel>
+</rss>

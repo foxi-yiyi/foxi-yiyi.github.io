@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>GUN Make 项目管理 - Moeah&#39;s BLOG</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="foxi-yiyi" /><meta name="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="GUN Make 项目管理" />
+<meta property="og:description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" />
+<meta property="article:published_time" content="2020-08-28T00:00:00+08:00" />
+<meta property="article:modified_time" content="2020-08-28T00:00:00+08:00" />
+<meta itemprop="name" content="GUN Make 项目管理">
+<meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
+<meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
+<meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
+<meta itemprop="wordCount" content="1815">
+
+
+
+<meta itemprop="keywords" content="GNU Makefile," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="GUN Make 项目管理"/>
+<meta name="twitter:description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Moeah&#39;s BLOG</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Moeah&#39;s BLOG</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">GUN Make 项目管理</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-08-28 </span>
+        <div class="post-category">
+            <a href="/categories/computer-science/"> Computer Science </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#第一章规则">第一章	规则</a>
+          <ul>
+            <li><a href="#11规则">1.1规则</a></li>
+            <li><a href="#12变量与宏">1.2变量与宏</a></li>
+            <li><a href="#13函数">1.3函数</a></li>
+            <li><a href="#14命令">1.4命令</a></li>
+          </ul>
+        </li>
+        <li><a href="#第二章高级与特别的用法">第二章	高级与特别的用法</a>
+          <ul>
+            <li><a href="#21大型项目的管理">2.1大型项目的管理</a></li>
+            <li><a href="#22-可以移植性的makefile">2.2 可以移植性的makefile</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="第一章规则">第一章	规则</h2>
+<h3 id="11规则">1.1规则</h3>
+<h4 id="具体规则">具体规则</h4>
+<p>​	具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">vpath.o	variable.o	</span><span class="o">:</span>	<span class="n">make</span>.<span class="n">h</span> <span class="n">config</span>.<span class="n">h</span> <span class="n">dep</span>.<span class="n">h</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这代表vpath和variable使用的相同的文件。</p>
+<p>​	其实<strong>不必将所有的规则一次性全部定义</strong>，每当make看到一个工作目标，就会将工作目标和必要条件加入依存图。但是对于较复杂的应用来说，必要条件可以组成字看似毫无关联的文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 确定vpath.c被编译之前lexer.c就已经创建好了
+</span><span class="c"></span><span class="nf">vpath.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">c</span>
+<span class="err">...</span>
+
+<span class="c"># 用比较特殊的标记进行编译
+</span><span class="c"></span><span class="nf">vpath.o</span><span class="o">:</span><span class="n">vpath</span>.<span class="n">c</span>
+	<span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>RULE_FLAGS<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+<span class="err">...</span>
+
+<span class="c">#引入一个应用程序所产生的依存关系
+</span><span class="c"></span><span class="err">include</span> <span class="err">auto-generated-dependencies.d</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="通配符">通配符</h4>
+<p>​	当有一长串文件需要执行，而有不方便一一指定时，为了简化make的编写，可以采用通配符的方式。make的通配符如同shell的～，*，？，[&hellip;]，[/^&hellip;]。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">*.* 	: 	文件名中包含.号的所有文件；
+?	：	任何但一字符；
+<span class="o">[</span>...<span class="o">]</span>	:	代表一个字符集；
+<span class="o">[</span>^...<span class="o">]</span>	：	代表某个字符集的补集；
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="假想工作目标">假想工作目标</h4>
+<p>​	假想工作目标之所以较假想，是因为它不需要实际的工作目标。任何不代表文件的工作目标就叫做假想工作目标。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">clean</span><span class="o">:</span>
+	rm -rf *.o lexer.c
+</code></pre></td></tr></table>
+</div>
+</div><p>通常，make会执行假想工作目标，因为它并不会创建爱你医改工作目标为名词的文件。</p>
+<p><strong>需要注意的是：make无法区分文件形式的工作目标和假想工作目标</strong>。如果当前目录中有和假想名字相同的文件，make就会混淆无法区分。为了避免这个问题，GNU make体提供了一个特殊的工作目标 —— .PHONY，用来告诉make，该目标不是一个真正的文件而是一个假想工作目标。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">.PHONY</span><span class="o">:</span><span class="n">clean</span>
+<span class="nf">clean</span><span class="o">:</span>
+	rm -rf *.o lex.c
+</code></pre></td></tr></table>
+</div>
+</div><p>假想工作目标可以作为另一个工作目标的必要条件。可以让make在进行世纪工作目标之前调用假想工作目标所代表的脚本。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 示例一：
+</span><span class="c"></span><span class="nf">.PHONY</span><span class="o">:</span><span class="n">make</span>-<span class="n">documentation</span>
+<span class="nf">make-documentation</span><span class="o">:</span>
+	df -k . <span class="p">|</span> awk <span class="s1">&#39;NR == 2 ( printf(&#34;%d available\n&#34;, $$4) )&#39;</span>
+	....
+	
+<span class="c"># 示例二
+</span><span class="c"></span><span class="nf">.PHONY</span><span class="o">:</span><span class="n">make</span>-<span class="n">documentation</span>
+<span class="nf">make-documentation</span><span class="o">:</span><span class="n">df</span>
+	....
+
+<span class="nf">.PHONY</span><span class="o">:</span><span class="n">df</span>
+<span class="nf">df</span><span class="o">:</span>
+	df -k . <span class="p">|</span> awk <span class="s1">&#39;NR == 2 ( printf(&#34;%d available\n&#34;, $$4) )&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述示例1的问题在于：make-documentation中的命令在不同的环境运行需要做出不同的对应修改。如果全文后续省略部分有多处此命令，维护起来比较困难；如果将这句命令放在df的假想命令中，可以省去很多维护的麻烦。</p>
+<p>假想工作目标还有很多其他的好处。</p>
+<p>make的编写采用从上而下，执行采用从下而上。这么多层次的执行往往不好判断当前make运行的位置。采用假想工作目标可避免此问题。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">$(Program)</span><span class="o">:</span><span class="n">build_msg</span> <span class="k">$(</span><span class="nv">OBJETCS</span><span class="k">)</span> <span class="k">$(</span><span class="nv">BUILDINS_DEP</span><span class="k">)</span>
+	<span class="k">$(</span>RM<span class="k">)</span> <span class="nv">$@</span>
+	<span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="k">$(</span>Program<span class="k">)</span> <span class="k">$(</span>OBJETCS<span class="k">)</span> <span class="k">$(</span>LIBS<span class="k">)</span>
+	ls -al <span class="k">$(</span>Program<span class="k">)</span>
+	
+<span class="nf">.PHONY</span><span class="o">:</span><span class="n">build_msg</span>
+<span class="nf">build_msg</span><span class="o">:</span>
+	@printf <span class="s2">&#34;#\n# Building </span><span class="k">$(</span>Program<span class="k">)</span><span class="s2">\n #\n&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	由于printf在假想工作目标中，在任何必要条件更新时都会输出信息。如果以build_msg作为$(Program)命令脚本的第一个命令，那么所有编译结果和依存关系都产生后才会执行这个命令。<strong>由于假想工作目标总是尚未更新，所以假想目标build_msg会导致$(Program)被重建——即使已经被更新</strong>。这么做似乎很明智，所有的计算工作在编译文件时候已经基本完成了，因此只有最后的链接一定会被执行。</p>
+<h4 id="空工作目标">空工作目标</h4>
+<p>​	空工作目标可以用来发挥一些潜在的能力，前文指出：假想工作目标总是尚未更新，所以假想工作目标总是会被执行，并且总是会是的他们的依存对象被重建。当有些规则不会输出任何文件，只是偶尔被执行以下，并且不想让依存对象被更新。就可以建立空工作目标</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">prog</span><span class="o">:</span><span class="n">size</span> <span class="n">prog</span>.<span class="n">o</span>
+	<span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> $^
+	
+<span class="nf">size</span><span class="o">:</span><span class="n">prog</span>.<span class="n">o</span>
+	size $^
+	touch size
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="变量">变量</h4>
+<p>​	最简单的变量形如：<code>$(variable-name)</code>。</p>
+<p>​	这代表着任何文字都可以被包含在变量中，而且大多数字符都可以用在变量名称上，但是必须<strong>用$() 或 ${}括住</strong>，这样make才会认得。<strong>注意的是：但一字母的变量不要用$()括号的方式括住</strong>。</p>
+<h4 id="自动变量"><strong>自动变量</strong></h4>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>$@</strong></td>
+<td><strong>工作目标</strong>的名字</td>
+</tr>
+<tr>
+<td>$%</td>
+<td>档案文件成员结构中的文件名元素。</td>
+</tr>
+<tr>
+<td><strong>$&lt;</strong></td>
+<td><strong>第一个</strong>必要的文件名</td>
+</tr>
+<tr>
+<td>$?</td>
+<td>时间戳在工作目标之后的所有必要条件，并以空格隔开这些条件。</td>
+</tr>
+<tr>
+<td><strong>$^</strong></td>
+<td><strong>所有必要条件</strong>的文件名，并用空格分隔，<strong>去重</strong>。</td>
+</tr>
+<tr>
+<td><strong>$+</strong></td>
+<td>形式如$^:代表<strong>所有必要文件</strong>的名称，并用空格分隔，<strong>不去重</strong>。</td>
+</tr>
+<tr>
+<td>$*</td>
+<td>工作目标的主文件名，一个文件名称由两个部分形成：<strong>主文件名</strong>和<strong>扩展文件名</strong>。[<strong>请勿在模式规则以外使用此变量</strong>]</td>
+</tr>
+</tbody>
+</table>
+<p>具体形式如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">count_words</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">o</span> <span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+	gcc $^ -o <span class="nv">$@</span>
+
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">c</span>
+	gcc $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">c</span>
+	gcc $&lt;
+	
+<span class="nf">lexer.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">l</span>
+	flex -t $&lt; &gt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="用vpath和vpath来查找文件"><strong>用VPATH和vpath来查找文件</strong></h4>
+<p>​	有时候的真实情况比较复杂，所有的文件不是都存在同一个目录下的。接下来以重构refactor为例子，进行实际的文件布局。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">#include &lt;lexer.h&gt;
+#include &lt;counter.h&gt;
+
+void counter(int counts[])
+{
+	while ( yylex() )
+		;
+	counts[0] = file_count;
+
+
+}
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="12变量与宏">1.2变量与宏</h3>
+<h3 id="13函数">1.3函数</h3>
+<h3 id="14命令">1.4命令</h3>
+<h2 id="第二章高级与特别的用法">第二章	高级与特别的用法</h2>
+<h3 id="21大型项目的管理">2.1大型项目的管理</h3>
+<h3 id="22-可以移植性的makefile">2.2 可以移植性的makefile</h3>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">foxi-yiyi</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-08-28
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">Moeah</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/gnu-makefile/">GNU Makefile</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/c%E8%AF%AD%E8%A8%80%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88/">
+            <span class="next-text nav-default">C语言：什么是指针，自己的小理解</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="https://foxi-yiyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">foxi-yiyi</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

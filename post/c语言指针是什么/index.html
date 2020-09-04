@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>C语言：什么是指针，自己的小理解 - Moeah&#39;s BLOG</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="foxi-yiyi" /><meta name="description" content="什么是指向XXX？ 首先C语言中存在多种数据类型，int，double，float或struct等。计算机使用内存来保存运算过程中某些必要的具" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="https://foxi-yiyi.github.io/post/c%E8%AF%AD%E8%A8%80%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="C语言：什么是指针，自己的小理解" />
+<meta property="og:description" content="什么是指向XXX？ 首先C语言中存在多种数据类型，int，double，float或struct等。计算机使用内存来保存运算过程中某些必要的具" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://foxi-yiyi.github.io/post/c%E8%AF%AD%E8%A8%80%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88/" />
+<meta property="article:published_time" content="2020-08-21T00:00:00+08:00" />
+<meta property="article:modified_time" content="2020-08-21T00:00:00+08:00" />
+<meta itemprop="name" content="C语言：什么是指针，自己的小理解">
+<meta itemprop="description" content="什么是指向XXX？ 首先C语言中存在多种数据类型，int，double，float或struct等。计算机使用内存来保存运算过程中某些必要的具">
+<meta itemprop="datePublished" content="2020-08-21T00:00:00+08:00" />
+<meta itemprop="dateModified" content="2020-08-21T00:00:00+08:00" />
+<meta itemprop="wordCount" content="592">
+
+
+
+<meta itemprop="keywords" content="C语言,Programing," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="C语言：什么是指针，自己的小理解"/>
+<meta name="twitter:description" content="什么是指向XXX？ 首先C语言中存在多种数据类型，int，double，float或struct等。计算机使用内存来保存运算过程中某些必要的具"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Moeah&#39;s BLOG</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Moeah&#39;s BLOG</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">C语言：什么是指针，自己的小理解</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-08-21 </span>
+        <div class="post-category">
+            <a href="/categories/computer-science/"> Computer Science </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#什么是指向xxx">什么是指向XXX？</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="什么是指向xxx">什么是指向XXX？</h1>
+<p>首先C语言中存在多种数据类型，int，double，float或struct等。计算机使用内存来保存运算过程中某些必要的具有数据类型特点的数据信息。有时候这些“数值”往往规模庞大，成员众多。
+C语言的工程师创造了指针这个伟大的类型。指针的最大作用是用来<strong>保存一个地址</strong>，这个地址所代表的数据类型种类繁多。这也就意味着C语言声明一个指针类型变量的时候，要求用户务必给定地址所代表的数据类型（void 也理解成一种类型）</p>
+<p>指针是变量。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-C" data-lang="C"><span class="kt">int</span>     <span class="n">a</span><span class="p">;</span>  <span class="c1">//定义了变量a，用于保存int类型的数据。
+</span><span class="c1"></span><span class="kt">int</span>     <span class="o">*</span><span class="n">b</span><span class="p">;</span> <span class="c1">//定义了指针变量b，用户保存一个地址，这个地址所代表的数据类型是int。
+</span><span class="c1"></span>            <span class="c1">//指针变量b，保存的地址，所代表的数据类型是int。
+</span><span class="c1"></span>            <span class="cm">/*
+</span><span class="cm">                这也就意味着，一般不会给指针直接赋一个有意义的值，而是将保存着这个有意义数据的地址，交给指针变量保管。
+</span><span class="cm">            */</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>指针是变量，可以赋值。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-C" data-lang="C">    <span class="n">b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">;</span> <span class="c1">//&amp;表示取地址。意思是将a的地址交给指针变量b保存。
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span>  
+    <span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>  <span class="c1">//又声明了一个指针变量c，并将b的值（b是指针变量，保存的是a的地址）赋值给c。现在c变量的值和b变量的值一样，都是a的地址。
+</span><span class="c1"></span>
+</code></pre></td></tr></table>
+</div>
+</div><p>指针是变量，保存的值可以变。也就是说保存的地址是可变的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-C" data-lang="C">    <span class="kt">int</span> <span class="n">d</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">e</span><span class="p">;</span>
+    <span class="n">e</span><span class="o">=&amp;</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">//e保存了数组d的第一个数据的地址
+</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">*</span><span class="n">e</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//把该地址中的数据赋值0  e++;   //地址累加一次，也就是数组中下一个数据的地址
+</span><span class="c1"></span>    <span class="p">}</span>
+
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">foxi-yiyi</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-08-21
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">Moeah</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/c%E8%AF%AD%E8%A8%80/">C语言</a>
+          <a href="/tags/programing/">Programing</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">GUN Make 项目管理</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F01%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%A6%82%E5%BF%B5/">
+            <span class="next-text nav-default">操作系统：进程的概念</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="https://foxi-yiyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">foxi-yiyi</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

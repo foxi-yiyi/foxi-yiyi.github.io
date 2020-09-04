@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>操作系统：进程的概念 - Moeah&#39;s BLOG</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="foxi-yiyi" /><meta name="description" content="操作系统——01：进程的概念 设计操作系统的目的是什么？ 对于某个程序来说，一定会同时需要CPU和IO同时操作，有时候会出现CPU的利用率不高的" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F01%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%A6%82%E5%BF%B5/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="操作系统：进程的概念" />
+<meta property="og:description" content="操作系统——01：进程的概念 设计操作系统的目的是什么？ 对于某个程序来说，一定会同时需要CPU和IO同时操作，有时候会出现CPU的利用率不高的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F01%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%A6%82%E5%BF%B5/" />
+<meta property="article:published_time" content="2020-08-21T00:00:00+08:00" />
+<meta property="article:modified_time" content="2020-08-21T00:00:00+08:00" />
+<meta itemprop="name" content="操作系统：进程的概念">
+<meta itemprop="description" content="操作系统——01：进程的概念 设计操作系统的目的是什么？ 对于某个程序来说，一定会同时需要CPU和IO同时操作，有时候会出现CPU的利用率不高的">
+<meta itemprop="datePublished" content="2020-08-21T00:00:00+08:00" />
+<meta itemprop="dateModified" content="2020-08-21T00:00:00+08:00" />
+<meta itemprop="wordCount" content="2457">
+
+
+
+<meta itemprop="keywords" content="OS," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="操作系统：进程的概念"/>
+<meta name="twitter:description" content="操作系统——01：进程的概念 设计操作系统的目的是什么？ 对于某个程序来说，一定会同时需要CPU和IO同时操作，有时候会出现CPU的利用率不高的"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Moeah&#39;s BLOG</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Moeah&#39;s BLOG</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">操作系统：进程的概念</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-08-21 </span>
+        <div class="post-category">
+            <a href="/categories/computer-science/"> Computer Science </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#操作系统01进程的概念">操作系统——01：进程的概念</a>
+      <ul>
+        <li><a href="#设计操作系统的目的是什么">设计操作系统的目的是什么？</a></li>
+        <li><a href="#怎么划分这些需要同时处理的任务呢">怎么划分这些需要同时处理的任务呢？</a></li>
+        <li><a href="#用来描述处理任务的进程有什么特点">用来描述处理任务的“进程”有什么特点？</a></li>
+        <li><a href="#如何描述进程">如何描述进程？</a>
+          <ul>
+            <li><a href="#1怎么描述进程---pcb">1.怎么描述进程&mdash;PCB？</a></li>
+            <li><a href="#2进程的上下文切换为什么是额外开销">2.进程的上下文切换？为什么是额外开销？</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="操作系统01进程的概念">操作系统——01：进程的概念</h1>
+<h2 id="设计操作系统的目的是什么">设计操作系统的目的是什么？</h2>
+<p>对于某个程序来说，一定会同时需要CPU和IO同时操作，有时候会出现CPU的利用率不高的情况，达不到100%。</p>
+<p><img src="/OS01-01.png" alt="Local Picture" title="Local Picture"></p>
+<p><img src="OS01-01.png" alt=""></p>
+<p>如上图所示，有些时候CPU的使用率低下，没有真的处理任务，而是在等待其他任务在IO上的响应。而计算机在设计初期资源宝贵，需要尽量让CPU一刻不停的运算，为此就需要合理分配CPU在多个程序之间来回切换，进而保证整个运算资源能够被充分的利用起来。</p>
+<p>操作系统的目的之一 —— <strong>让资源高效的运行</strong></p>
+<p>如上图所示，假设系统中有两个程序要运行。系统组织得当的话，当A程序进行IO操作的时候让B程序进行CPU操作。这就可以使得CPU的工作机会是100%。这个想法有一定的历史原因，半导体时期的CPU资源是非常昂贵的，人们将要运行的很多程序放在内存中，最终保证CPU饱满的运行。</p>
+<h2 id="怎么划分这些需要同时处理的任务呢">怎么划分这些需要同时处理的任务呢？</h2>
+<p>计算机宏观上可以处理多个任务，但是微观上每个时刻只能处理一个任务。高效协调的一大想法就是将这些待处理的任务在不同的时序处理不同的阶段，并针对这些任务进行规划。</p>
+<p>首先很自然的会联想到采用程序进行任务的划分：每个程序代表一个任务，按照不同的程序进行计算机资源的分配；但是这个想法有个最致命的缺陷：<strong>一个程序可能被不同的用户执行，得到不同的结果</strong>。所以单单用程序进行划分显然不合适。</p>
+<p><strong>进程process就是计算机科学家们创造出来的概念，用于区分这些任务。</strong></p>
+<h2 id="用来描述处理任务的进程有什么特点">用来描述处理任务的“进程”有什么特点？</h2>
+<p>进程就是一个正在运行中的程序，为什么要区分不同的进程呢？怎么区分不同的进程呢？</p>
+<blockquote>
+<p>为什么要区分不同的进程？</p>
+</blockquote>
+<p>前文已经叙述过，操作系统的目的就是使计算机够有效地<strong>合理分配计算机的运算资源</strong>。进程不可能每时每刻都需要所有的计算机部件共同配合完成自己的运算。当一个进程对某个运算资源资源进行高负载的利用时，就可以安排其他进程对别的运算资源进行利用。如此一来每个运算资源都在持续的工作。此举就可以提高资源的利用率。</p>
+<blockquote>
+<p>怎么区分不同的进程？</p>
+</blockquote>
+<p>我对进程的理解是：需要被分配运算资源的单位，区分进程的策略也围绕一点，一定要让进程之间占用不同的运算资源。首先不同的程序一定占用资源有所不同。那么运行程序不同的任务肯定可以划分为不同的进程。当同样的程序处理不同的数据时，处理方式也有所不同。所以处理不同数据的任务也可以视为不同的进程。当两个任务所运行的程序相同，处理的数据也相同，但是处于不同的阶段，所需要的运算资源也天差地别。所以描述进程需要明确进程所以依附的运算程序，运算的数据和运行到当前时刻所处的状态。</p>
+<blockquote>
+<p>Process : A program in execution;process execution must progress in sequential fashion.</p>
+<blockquote>
+<p>1.处于什么状态；只有在运行中的程序才有分配资源的必要。所以进程到底是在什么运行阶段，就变得尤为重要，毕竟不同阶段的运行状态所需要的运算处理资源有所不同。同样的程序，处理相同的程序如果处于不同状态也需要按照不同进程进行资源的合理调配。</p>
+<p>2.执行什么程序： 程序可以指导计算机怎么处理数据和资源，不同的程序运行的目的、步骤、涉及到的资源分配也不同。这也是区分进程的一个重要因素。</p>
+<p>3.运算什么数据： 不同的任务处理的数据不同（不同的输入数据），这也是区分进程的一个重要因素</p>
+</blockquote>
+</blockquote>
+<h2 id="如何描述进程">如何描述进程？</h2>
+<h3 id="1怎么描述进程---pcb">1.怎么描述进程&mdash;PCB？</h3>
+<p>处于不同状态的进程，所用到的运算资源有所不同，所以要对进城的状态进行描述。不同的系统有不同的进程状态描述，这里大致分为五种。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/*
+</span><span class="cm">    new:		 进程处于起始状态，刚刚被创建
+</span><span class="cm">    terminated：	进程处于结束状态，可以回收资源
+</span><span class="cm">        //不同系统由区别
+</span><span class="cm">    ready：		进程处于就绪状态，可以执行
+</span><span class="cm">    running：	进程处于运行状态，正在使用运算资源进行运算
+</span><span class="cm">    waiting：	进程处于等待状态，正在等待资源或者通讯响应
+</span><span class="cm">*/</span>
+<span class="cm">/*
+</span><span class="cm">	PCB (process controler Block)一般包含: 
+</span><span class="cm">                                            进程状态
+</span><span class="cm">                                            程序控制器，指向下一条的指令
+</span><span class="cm">                                            CPU寄存器
+</span><span class="cm">                                            CPU调度信息
+</span><span class="cm">                                            内存管理信息
+</span><span class="cm">                                            记账信息，占用了多少资源等信息
+</span><span class="cm">                                            IO信息
+</span><span class="cm">											...
+</span><span class="cm">											...
+</span><span class="cm">	每个PCB对应一个进程，用来描述进程的各种信息。
+</span><span class="cm">*/</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>既然每个PCB对应一个进程，通过链表的结构可以将就绪状态的进程放进一个队列。执行状态的进程最多只有一个。而等待状态不能按照就需状态划分到一个队列中，需要进一步细化：等待同一个资源的进程要放在一个队列当中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/*操作系统通过维护类似的队列来维护整个所有进程的状态*/</span>
+<span class="n">ready</span> <span class="n">queue</span><span class="err">：</span>
+    			<span class="n">head</span> <span class="o">-&gt;</span>  <span class="n">PCB1</span><span class="p">[...]</span> <span class="o">-&gt;</span> <span class="n">PCB4</span><span class="p">[...]</span> <span class="o">-&gt;</span> <span class="n">PCB8</span><span class="p">[...]</span>
+
+<span class="n">mag</span> <span class="n">tap</span> <span class="n">queue</span> <span class="mi">0</span><span class="o">:</span>
+				<span class="n">head</span> <span class="o">-&gt;</span> <span class="n">PCB2</span><span class="p">[...]</span>
+                    
+<span class="n">mag</span> <span class="n">tap</span> <span class="n">queue</span> <span class="mi">1</span><span class="o">:</span>
+				<span class="n">head</span> <span class="o">-&gt;</span> <span class="n">PCB3</span><span class="p">[...]</span>
+
+<span class="n">disk</span> <span class="nl">queue</span><span class="p">:</span>
+				<span class="n">head</span> <span class="o">-&gt;</span> <span class="n">PCB5</span><span class="p">[...]</span> <span class="o">-&gt;</span> <span class="n">PCB6</span><span class="p">[...]</span>
+
+<span class="n">terminal</span> <span class="n">queue</span> 
+				<span class="n">head</span> <span class="o">-&gt;</span> <span class="n">PCB7</span><span class="p">[...]</span>
+<span class="p">...</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在内存空间的角度看来，操作系统是在维护整个队列，操作系统的管理无非就是怎么把某个PCB拎到某个队列，拎出某个队列。进程会在这些队列之间不断地迁移知道最终被终止。</p>
+<p><img src="/OS01-02.png" alt="Local Picture" title="Local Picture"></p>
+<p><img src="OS01-02.png" alt=""></p>
+<p>如上图所示，一个进程首先会进入就绪队列，并在随后的某个时刻得到CPU的响应。随后会转到其他设备的等待队列中去。当所需要的IO等待队列轮到该进程时，IO为其服务处理结束后再进入准备状态等待CPU为其服务。当这个进程创建了子进程时，需要等待子进程运行后，才能进行接下来的操作，此时进程等待的是子进程的资源。或者进程等待的是中断信号，中断来临之前会转到等待中断队列中。综上单个进程就是在多个队列中进行不断地迁移直到最终终止。</p>
+<h3 id="2进程的上下文切换为什么是额外开销">2.进程的上下文切换？为什么是额外开销？</h3>
+<p>进程希望自己的变量保存在寄存器或者内存中，能够加快运行速度，但是寄存器数量很有限。当CPU切换到另一个进程时，CPU中的寄存器可能还保留着上一个进程的数据。所以需要按照下图的方式进行进程调度。</p>
+<p>PCB0此时拥有CPU，寄存器内部保存着PCB0的数据。但是此时需要转换到PCB1进行计算，PCB0在交出资源时需要首先保存自己进程的的寄存器信息。PCB1在得到CPU资源时，首先会恢复自己的寄存器现场。PCB1运行一段时间过后，当PCB1需要交出CPU的使用权时，也需要首先保留自己的寄存器状态。</p>
+<p>上述这些开销对于单一的进程没有帮助，但是却有助于多任务的处理。也就意味着系统为了处理多任务引入了这些额外操作，但是这些操作对于单个进程的运行是负担，合理的设计就显得很重要。</p>
+<p><img src="/OS01-03.png" alt="Local Picture" title="Local Picture"></p>
+<p><img src="OS01-03.png" alt=""></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">foxi-yiyi</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-08-21
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">Moeah</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/os/">OS</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/c%E8%AF%AD%E8%A8%80%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">C语言：什么是指针，自己的小理解</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/quantum-break-english-pieces/">
+            <span class="next-text nav-default">Quantum Break English pieces</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="https://foxi-yiyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">foxi-yiyi</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
