@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="1815">
+<meta itemprop="wordCount" content="3216">
 
 
 
@@ -413,22 +413,301 @@
 </span><span class="lnt"> 9
 </span><span class="lnt">10
 </span><span class="lnt">11
+</span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">#include &lt;lexer.h&gt;
-#include &lt;counter.h&gt;
-
-void counter(int counts[])
-{
-	while ( yylex() )
-		;
-	counts[0] = file_count;
-
-
-}
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;lexer.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;counter.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">counter</span><span class="p">(</span><span class="kt">int</span> <span class="n">counts</span><span class="p">[])</span>
+<span class="p">{</span>
+	<span class="k">while</span> <span class="p">(</span> <span class="n">yylex</span><span class="p">()</span> <span class="p">)</span>
+		<span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fee_count</span><span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fie</span> <span class="n">_count</span><span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">foe_count</span><span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">fum_count</span><span class="p">;</span>
+<span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h3 id="12变量与宏">1.2变量与宏</h3>
+</div><p>​	如果将其写成可重复使用的库函数，在头文件中应该要有一个声明，所以我们可以创建counter.h来包含这个声明：</p>
+<ul>
+<li>counter.h</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef COUNTER_H_
+</span><span class="cp">#define COUNTER_H_
+</span><span class="cp"></span>
+<span class="k">extern</span> <span class="kt">void</span>
+	<span class="nf">counter</span><span class="p">(</span> <span class="kt">int</span> <span class="n">counts</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="p">);</span>
+
+<span class="cp">#endif
+</span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>​	lexer.h</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef LEXER_H_
+</span><span class="cp">#define LEXER_H_
+</span><span class="cp"></span>
+<span class="k">extern</span> <span class="kt">int</span> <span class="n">fee_count</span><span class="p">,</span> <span class="n">fie_count</span><span class="p">,</span> <span class="n">foe_count</span><span class="p">,</span> <span class="n">fum_count</span><span class="p">;</span>
+<span class="k">extern</span> <span class="kt">int</span> <span class="nf">yylex</span><span class="p">(</span> <span class="kt">void</span> <span class="p">);</span>
+
+<span class="cp">#endif
+</span></code></pre></td></tr></table>
+</div>
+</div><p>​</p>
+<p>假设现在形成了如下的目录结构：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 目录结构示意</span>
+├── include
+│   ├── counter.h
+│   └── lexer.h
+├── Makefile
+└── src
+    ├── counter.c
+    ├── count_words.c
+    └── lexer.l
+</code></pre></td></tr></table>
+</div>
+</div><p>在更改了目录结构以后，代码的元文件都被安置在src目录，头文件都被安置在include目录。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 上述目录结构的makefile例子
+</span><span class="c"></span><span class="nv">CPPFLAGS</span> <span class="o">=</span> -I include
+<span class="nv">VPATH</span> <span class="o">=</span> src include
+
+<span class="nf">count_words</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">o</span> <span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+	gcc  $^ -o <span class="nv">$@</span>
+
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">couter</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">counter</span>.<span class="n">h</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.c</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">l</span>
+	flex -t $&lt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	上述makefile规定了VPATH 和 CPPFLAGS，用于告诉make编译时候需要寻找的路径。但是VPATH有个很大的问题 —— <del>无法处理不同目录下的同名文件</del>。make在找到多个不同目录下的同名文件时，会默认寻找第一个文件。可以采用如下指令语法：</p>
+<p>​										<code>VAPTH pattern directory-list</code></p>
+<p>现在可以将之前的path进行修改：相当于告诉了make应该在src中搜寻.c .l 文件，在include目录中搜寻 .h文件。(这样以来就可以在头文件中移除 include/xxx.h 字样)。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 上述目录结构的makefile例子
+</span><span class="c"></span><span class="nv">CPPFLAGS</span> <span class="o">=</span> -I include
+
+<span class="c"># VPATH pattern dir
+</span><span class="c"></span><span class="err">VPATH</span> <span class="err">*.h</span> <span class="err">include</span>
+<span class="err">VAPTH</span> <span class="err">*.c</span> <span class="err">*.l</span> <span class="err">src</span>     
+
+<span class="nf">count_words</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">o</span> <span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+	gcc  $^ -o <span class="nv">$@</span>
+
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">couter</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">counter</span>.<span class="n">h</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.c</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">l</span>
+	flex -t $&lt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	总的来说使用VPATH解决<strong>源文件散落在多个目录中</strong>的问题，不过也可能出现仅用vpath无法解决的问题，稍后会接着讨论。</p>
+<h4 id="模式规则"><strong>模式规则</strong></h4>
+<p>上述例子中的makefile已经有点冗余了，如果整个工程非常庞大。千百个文件的对应关系都要手动一一指定，不仅麻烦也会占用大量的时间修正makefile。</p>
+<p>​	makefile可以使用文件名匹配的方式简化规则的建立，以及提供内置规则来处理。意思就是C语言的编译器会默认的将.c 文件编译成同名的.o文件；将.l文件编译成同名的.c文件。这就使得在书写makefile时有些必要条件的文件可以省略。举个例子上述makefile如果使用模式规则的方式进行简化：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 上述目录结构的makefile例子
+</span><span class="c"></span><span class="nv">vpath</span> <span class="o">=</span> src include 
+<span class="nv">CPPFLAGS</span> <span class="o">=</span> -I include
+
+<span class="nf">count_words</span><span class="o">:</span><span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">h</span>
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">h</span> <span class="n">lexer</span>.<span class="n">h</span>
+<span class="nf">lexer.c</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">h</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	这里面所有的内置规则都是模式规则的实例。一个模式规则看起来就像一般的规则，只是主文件名被表示成%字符，正面这个makefile之所以可行是因为内部隐藏了三个内置规则：</p>
+<ol>
+<li>
+<p>*.c -&gt; *.o</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.o</span><span class="o">:</span>%.<span class="n">c</span>
+ <span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>*.l -&gt; *.c</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.c</span><span class="o">:</span>%.<span class="n">l</span>
+ @<span class="k">$(</span>RM<span class="k">)</span> <span class="nv">$@</span>
+ <span class="k">$(</span>LEX.l<span class="k">)</span> $&lt; &gt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>*.c -&gt; xxx</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%</span><span class="o">:</span>%.<span class="n">c</span>
+ <span class="k">$(</span>LINK.c<span class="k">)</span> $^ <span class="k">$(</span>LOADFILES<span class="k">)</span> <span class="k">$(</span>LDLIBS<span class="k">)</span> -o <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<h5 id="模式">模式</h5>
+<p>模式规则中的%符号，等效于unix中的*，可以代替任意多个字符。可以用在任何地方但是只能出现一次。文件名中%以外的模式匹配会按照字符一一匹配。</p>
+<h5 id="特定工作目标的静态规则">特定工作目标的静态规则</h5>
+<p>静态模式规则只能用在特定的工作目标上，且与其他规则的不同点就是前面多了一个$(OBJECTS)：规范。这就会使得该规则只能应用在$(OBJECTS)变量中所列举的文件上。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">$(OBJECTS)</span><span class="o">:</span>%.<span class="n">o</span>:%.<span class="n">c</span>
+	<span class="k">$(</span>CC<span class="k">)</span> -c <span class="k">$(</span>CPPFLAGS<span class="k">)</span> $&lt; -o <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>也就是说$(OBJECTS)中涉及到的所有的文件都适用这个规则。</p>
+<h5 id="后缀规则">后缀规则</h5>
+<p>后缀规则是用来定义隐含规则的最初方案，虽然不常用但是依旧会在某些时候见到这种用法。</p>
+<p>后缀规则中的工作目标，可以是一个或两个被衔接到一块的扩展名：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">.c.o</span><span class="o">:</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+	
+<span class="c"># 区别于之前介绍的模式规则
+</span><span class="c"></span>
+<span class="nf">%.o</span><span class="o">:</span>%.<span class="n">c</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+</code></pre></td></tr></table>
+</div>
+</div><p>后缀规则要求make中只会在这两个扩展名都在已知扩展名列表时，才将之市委后缀规则。</p>
+<h4 id="隐含规则">隐含规则</h4>
+<h3 id="12变量与宏">1.2变量与宏</h3>
 <h3 id="13函数">1.3函数</h3>
 <h3 id="14命令">1.4命令</h3>
 <h2 id="第二章高级与特别的用法">第二章	高级与特别的用法</h2>
