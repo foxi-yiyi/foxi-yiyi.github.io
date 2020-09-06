@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="3216">
+<meta itemprop="wordCount" content="5340">
 
 
 
@@ -705,8 +705,107 @@
 	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
 </code></pre></td></tr></table>
 </div>
-</div><p>后缀规则要求make中只会在这两个扩展名都在已知扩展名列表时，才将之市委后缀规则。</p>
-<h4 id="隐含规则">隐含规则</h4>
+</div><p>后缀规则要求make中只会在这两个扩展名都在已知扩展名列表时，才将之视为后缀规则。</p>
+<h4 id="隐含规则的结构">隐含规则的结构</h4>
+<p>​	GNU make有90多个隐含规则，隐含规则并不是模式规则形式就是后缀规则的形式。这些内容的模式规则可应用于C，C++，Pascal，FORTRAN，ratfor，Modula等。如果使用这些工具的时候会发现make的内置规则中已经有了所需要的东西了。如果用到了未受支持的语言，比如java或者XML，就可能需要编写自己的规则了。当make检查一个工作目标时，如果找不到更新它的具体规则，就会使用内置的隐含规则。</p>
+<p>​	内置规则有标准的结构，方便用户进行自定义。下面的规则是从C源文件来更新目标文件的规则：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.o</span><span class="o">:</span>%.<span class="n">c</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+<span class="c"># 这个规则自定义取决于用到的变量。我们在此处看到了两个变量，其中一个COMPILE.c是由多个其他变量所定义的：
+</span><span class="c"></span>
+<span class="nv">COMPILE.c</span> <span class="o">=</span> <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> <span class="k">$(</span>TARGET_ARCH<span class="k">)</span> -c
+<span class="nv">CC</span> <span class="o">=</span> gcc
+<span class="nv">OUTPUT_OPTION</span> <span class="o">=</span> -o <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>只要修改了CC变量的设定值，就可以更换C的编译器。此外还包括用来设定编译选项的变量CFLAGS&hellip;</p>
+<p>​	在内置的规则中使用变量的目的，就是让规则的自定义尽可能简单。因此当需要在文件中自定义这些规则的时候，务必谨慎。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CPPFLAGS</span> <span class="o">=</span> -I project/includes
+</code></pre></td></tr></table>
+</div>
+</div><p>如果用户想在命令行上加入CPP的定义，一般会这样调用：<code>make CPPFLAGS=-DEBUG</code></p>
+<p>如果真的这么做了，会以外的删除编译时所需要的-I选项。命令行上所设定的变量会覆盖掉该变量原来的数值。所以不当的在makefile中设定CPPFLAGS会破坏用户预设的自定义结果。为了避免此类问题出现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">COMPILE.c</span> <span class="o">=</span> <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> <span class="k">$(</span>INCLUDES<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> <span class="k">$(</span>TARGET_ARCH<span class="k">)</span> -c
+<span class="nv">INCLUDES</span> <span class="o">=</span> -I project/include
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="特殊工作目标">特殊工作目标</h4>
+<p>特殊工作目标是一个内置的假象工作目标，用来变更make的默认行为。特殊工作目标的语法和一般工作目标的语法没有不同点，也就是<code>target : prerequisite</code>,但是target并非文件，而是一个假象工作目标。它们实际上是比较像用来修改make内部算法的指令。</p>
+<ul>
+<li>
+<p>.INTERMEDIATE:</p>
+<p>​		这个特殊工作目标的必要条件会被视为中间文件。如果make在更新另一个工作目标期间创建了该文件，则该文件将会在make运行结束时被自动删除。如果在make想要更新该文件之际该文件已经存在了，则该文件不会被删除。</p>
+</li>
+<li>
+<p>.SECONDARY:
+​		这个特殊工作目标的必要条件会被视为中间文件，但是不会被自动删除。.SECONDARY最常用来标示存储在程序库里的目标文件(object files)。按照惯例这些文件一旦被加入到档案库以后，就会被删除。在项目的开发期间保存这些文件，但是仍然使用make进行程序的更新，又是会比较方便。</p>
+</li>
+<li>
+<p>.PRECIOUS:</p>
+<p>​		当make期间中断时，如果自make启动以来该文件被修改过，make将会删除它正在更新的工作目标文件。因此不会在编译树中留下上位编译完成的文件，但是有时候却不希望make这么做。特别是在该文件很大而且编译代价也很大的时候。如果该文件几位珍贵，你就该用.PRECIOUS来标示它，这样的话make只有在自己信号被中断的时候才会这么做。</p>
+</li>
+<li>
+<p>.DELETE_ON_ERROR:</p>
+<p>​		.DELETE_ON_ERROR的作用和.PRECIOUS相反。将工作目标视为.DELETE_ON_ERROR，如果与规则响应的任何命令在运行时发生错误的话，就应该删除该工作目标文件。make通常只有在自己被信号中断时才会删除工作目标文件。</p>
+</li>
+</ul>
+<h4 id="自动生成依存关系">自动生成依存关系</h4>
+<p>​	在实际的工程环境中，会有个棘手的情况：大多数文件的头文件都会包含其他头文件从而生成结构复杂的树形结构。通过手动方式解析这些关系是一个令人绝望的事情。但是如果这些文件重新编译失败，可能会导致数小时的调试，此时该怎么处理呢？</p>
+<p>​	可以在make中加入一个include命令。如今大多数的make版本都支持include命令，GNU make当然一定支持这种方式。因此，诀窍就是编写一个makefile的工作目录，本工作目录的工作就是以-M选项对所有的源文件执行gcc命令，并将结果存入一个文件中(dependency file)，然后重新执行make以便于吧刚才产生的依存文件引入makefile，这样就可以触发所需要的更新：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">depend：count_word.c</span> <span class="err">lexer.c</span> <span class="err">counter.c</span>
+	<span class="k">$(</span><span class="nv">CC</span><span class="k">)</span> <span class="err">-M</span> <span class="k">$(</span><span class="nv">CPPFLAGS</span><span class="k">)</span> <span class="err">$^</span> <span class="err">&gt;</span> <span class="k">$@</span>
+<span class="err">include</span> <span class="err">depend</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>运行以前就应该执行make depend以产生依存关系。这么做虽然不错，但是当人们对源文件加入或者移除依存关系的时候，一般不会重新产生depend文件，这才会造成无法编译源文件。</p>
+<p>​	在GNU make中，可以简单地解决此问题：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.d</span><span class="o">:</span>%<span class="n">c</span>
+	<span class="k">$(</span>CC<span class="k">)</span> -M <span class="k">$(</span>CPPFLAGS<span class="k">)</span> $&lt; &gt; <span class="nv">$@</span>.<span class="nv">$$$$</span><span class="p">;</span>						<span class="se">\
+</span><span class="se"></span>	sed <span class="s1">&#39;s,\($*\)\.o[ :]*,\l.o $@ : ,g&#39;</span> &lt; <span class="nv">$@</span>.<span class="nv">$$$$</span> &gt; <span class="nv">$@</span><span class="p">;</span>		<span class="se">\
+</span><span class="se"></span>	rm -f <span class="nv">$@</span>.<span class="nv">$$$$</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这是一个令人印象深刻的小型命令脚本。首先会以 -M 的选项使用C编译器，以便创建一个包含此工作目标的依存关系的临时文件。该临时文件的名称由工作目标$@以及具唯一性的数字扩展名$$$$所组成。在shell中，变量$$会返回当前索引性的shell的进程编号。因为进程编号具有唯一性，所以这么做将可以产生一个独一无二的文件名。然后我们会使用sed以.d文件为工作目标加入此规划。</p>
+<p>sed表达式有搜索部分<code>\\($\*\)\.o[ :]\*</code>以及替换部分<code>\l.o $@ </code>：(以逗号为分隔符)组成。搜索表达式的开头是工作目标的主文件吗<code>$*</code>，被扩在正则表达式的分组<code>\(\)</code>中，后面跟着扩展名<code>\.o</code>。工作目标的文件名之后，将会出现0个或多个空格或冒号，即<code>[ :]*</code>。替换部分会通过引用第一个RE分组来做恢复最初的工作目标并且附加上扩展名，即<code>\l.o</code>，然后加入依存文件工作目标$@.</p>
+</blockquote>
 <h3 id="12变量与宏">1.2变量与宏</h3>
 <h3 id="13函数">1.3函数</h3>
 <h3 id="14命令">1.4命令</h3>
