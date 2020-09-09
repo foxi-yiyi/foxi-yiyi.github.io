@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="10527">
+<meta itemprop="wordCount" content="10523">
 
 
 
@@ -902,7 +902,7 @@
 </div>
 </div><p>make的变量有两种类型</p>
 <p><strong>1.简单扩展的变量</strong>：可以使用<code>:=</code>赋值运算定义一个简单扩展的变量：<code>MAKE_DEPEND := $(CC) -M</code></p>
-<p>**2.递归扩展的变量：**可以使用<code>=</code>赋值运算定义一个经过递归扩展的变量：<code>MAKE_DEPEND = $(CC) -M</code></p>
+<p><strong>2.递归扩展的变量</strong>：可以使用<code>=</code>赋值运算定义一个经过递归扩展的变量：<code>MAKE_DEPEND = $(CC) -M</code></p>
 <h4 id="其他的赋值类型">其他的赋值类型</h4>
 <p>make除了提供<code>:= </code>, <code>= </code>两种赋值类型意外，还提供了<code>?=</code>,<code>+=</code>两种赋值类型。</p>
 <p><code>?=</code>类型为附带条件的变量赋值运算符号——条件赋值。此条件只会存在于变量的值尚不存在的状况下进行变量要求的赋值动作。</p>
