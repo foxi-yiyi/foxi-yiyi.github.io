@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="5340">
+<meta itemprop="wordCount" content="7659">
 
 
 
@@ -151,9 +151,20 @@
             <li><a href="#自动变量"><strong>自动变量</strong></a></li>
             <li><a href="#用vpath和vpath来查找文件"><strong>用VPATH和vpath来查找文件</strong></a></li>
             <li><a href="#模式规则"><strong>模式规则</strong></a></li>
+            <li><a href="#隐含规则的结构">隐含规则的结构</a></li>
+            <li><a href="#特殊工作目标">特殊工作目标</a></li>
+            <li><a href="#自动生成依存关系">自动生成依存关系</a></li>
+            <li><a href="#双冒号规则">双冒号规则</a></li>
           </ul>
         </li>
-        <li><a href="#12变量与宏">1.2变量与宏</a></li>
+        <li><a href="#12变量与宏">1.2变量与宏</a>
+          <ul>
+            <li><a href="#变量的用途">变量的用途</a></li>
+            <li><a href="#宏">宏</a></li>
+            <li><a href="#何时扩展变量">何时扩展变量</a></li>
+            <li><a href="#工作目标域模式的专属变量">工作目标域模式的专属变量</a></li>
+          </ul>
+        </li>
         <li><a href="#13函数">1.3函数</a></li>
         <li><a href="#14命令">1.4命令</a></li>
       </ul>
@@ -713,7 +724,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>后缀规则要求make中只会在这两个扩展名都在已知扩展名列表时，才将之视为后缀规则。</p>
-<h4 id="隐含规则的结构">隐含规则的结构</h4>
+<h3 id="隐含规则的结构">隐含规则的结构</h3>
 <p>​	GNU make有90多个隐含规则，隐含规则并不是模式规则形式就是后缀规则的形式。这些内容的模式规则可应用于C，C++，Pascal，FORTRAN，ratfor，Modula等。如果使用这些工具的时候会发现make的内置规则中已经有了所需要的东西了。如果用到了未受支持的语言，比如java或者XML，就可能需要编写自己的规则了。当make检查一个工作目标时，如果找不到更新它的具体规则，就会使用内置的隐含规则。</p>
 <p>​	内置规则有标准的结构，方便用户进行自定义。下面的规则是从C源文件来更新目标文件的规则：</p>
 <div class="highlight"><div class="chroma">
@@ -758,7 +769,7 @@
 <span class="nv">INCLUDES</span> <span class="o">=</span> -I project/include
 </code></pre></td></tr></table>
 </div>
-</div><h4 id="特殊工作目标">特殊工作目标</h4>
+</div><h3 id="特殊工作目标">特殊工作目标</h3>
 <p>特殊工作目标是一个内置的假象工作目标，用来变更make的默认行为。特殊工作目标的语法和一般工作目标的语法没有不同点，也就是<code>target : prerequisite</code>,但是target并非文件，而是一个假象工作目标。它们实际上是比较像用来修改make内部算法的指令。</p>
 <ul>
 <li>
@@ -778,7 +789,7 @@
 <p>​		.DELETE_ON_ERROR的作用和.PRECIOUS相反。将工作目标视为.DELETE_ON_ERROR，如果与规则响应的任何命令在运行时发生错误的话，就应该删除该工作目标文件。make通常只有在自己被信号中断时才会删除工作目标文件。</p>
 </li>
 </ul>
-<h4 id="自动生成依存关系">自动生成依存关系</h4>
+<h3 id="自动生成依存关系">自动生成依存关系</h3>
 <p>​	在实际的工程环境中，会有个棘手的情况：大多数文件的头文件都会包含其他头文件从而生成结构复杂的树形结构。通过手动方式解析这些关系是一个令人绝望的事情。但是如果这些文件重新编译失败，可能会导致数小时的调试，此时该怎么处理呢？</p>
 <p>​	可以在make中加入一个include命令。如今大多数的make版本都支持include命令，GNU make当然一定支持这种方式。因此，诀窍就是编写一个makefile的工作目录，本工作目录的工作就是以-M选项对所有的源文件执行gcc命令，并将结果存入一个文件中(dependency file)，然后重新执行make以便于吧刚才产生的依存文件引入makefile，这样就可以触发所需要的更新：</p>
 <div class="highlight"><div class="chroma">
@@ -813,7 +824,211 @@
 <p>这是一个令人印象深刻的小型命令脚本。首先会以 -M 的选项使用C编译器，以便创建一个包含此工作目标的依存关系的临时文件。该临时文件的名称由工作目标$@以及具唯一性的数字扩展名$$$$所组成。在shell中，变量$$会返回当前索引性的shell的进程编号。因为进程编号具有唯一性，所以这么做将可以产生一个独一无二的文件名。然后我们会使用sed以.d文件为工作目标加入此规划。</p>
 <p>sed表达式有搜索部分<code>\\($\*\)\.o[ :]\*</code>以及替换部分<code>\l.o $@ </code>：(以逗号为分隔符)组成。搜索表达式的开头是工作目标的主文件吗<code>$*</code>，被扩在正则表达式的分组<code>\(\)</code>中，后面跟着扩展名<code>\.o</code>。工作目标的文件名之后，将会出现0个或多个空格或冒号，即<code>[ :]*</code>。替换部分会通过引用第一个RE分组来做恢复最初的工作目标并且附加上扩展名，即<code>\l.o</code>，然后加入依存文件工作目标$@.</p>
 </blockquote>
+<h3 id="双冒号规则">双冒号规则</h3>
+<p>TO DO</p>
 <h2 id="12变量与宏">1.2变量与宏</h2>
+<p>截止目前已经看到了makefile的变量及其应用。但是上述所有的例子太过粗浅，变量和宏越多越复杂，GNU make的功能就越强大。</p>
+<p>在我们的任何讨论之前，最好能够了解make的两种语言：<strong>描述工作目标和必要条件组成的依存图</strong>；<strong>用于进行文字替换的宏语言</strong>。make允许为较长的字符定义简写并在程序中使用这个简写，宏处理器会认出这个简写并将它们替换为展开后的形式。</p>
+<p>一个变量的名称集合可以由任何长度的字符组成，包括大部分的标点符号。变量名称是<strong>区分大小写</strong>的，所以cc和CC所指的是不同的变量，要取得某个变量的值可以使用<code>$()</code>将变量包含在内部。(<strong>如果变量为单一字符，则可以省略括号</strong>)</p>
+<blockquote>
+<p>当变量用来表示<strong>用户在命令行上或者环境中自定义的常数时，习惯上全部大写字母，下划线符号<code>_</code>分隔</strong>;</p>
+<p>当变量用来表示<strong>只出现在makefile中的变量则会全部用小写字母来表示名字。单词之间用破折号<code>-</code>分隔</strong>。</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 常数
+</span><span class="c"></span><span class="err">CC</span>		<span class="err">：=</span> <span class="err">gcc</span>
+<span class="nv">MKDIR</span>	<span class="o">:=</span>	mkdir -p
+
+<span class="c"># 内部变量
+</span><span class="c"></span><span class="nv">source</span> 	<span class="o">=</span>	*.c
+<span class="nv">objects</span>	<span class="o">=</span>	<span class="k">$(</span>subst .c,.o,<span class="k">$(</span><span class="nb">source</span><span class="k">))</span>
+
+<span class="c"># 函数
+</span><span class="c"></span><span class="nv">maybe-make-dir</span>	<span class="o">=</span>	<span class="k">$(if</span> <span class="k">$(</span>wildcard <span class="nv">$1</span><span class="k">)</span>,,<span class="k">$(</span>MKDIR<span class="k">)</span> <span class="nv">$1</span><span class="k">)</span>
+<span class="nv">assert-not-null</span>	<span class="o">=</span>	<span class="k">$(if</span> <span class="nv">$1</span>,,<span class="k">$(</span>error illegal null value.<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>需要注意的是，在对变量进行赋值的时候。从作为赋值符号的<code>等号（=）</code>右侧第一个非空字符开始直至最后，都被赋值给这个变量，包括行末的空格符号。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">LIB</span> <span class="o">=</span> libio.a <span class="c1"># LIB的赋值末尾包含了一个空格符</span>
+<span class="nf">missing_file</span><span class="o">:</span>
+	touch <span class="k">$(</span>LIB<span class="k">)</span>
+		ls -al <span class="p">|</span> grep <span class="s1">&#39;$(LIB)&#39;</span>
+	
+<span class="c"># 上述makefile运行结果会出现问题，因为LIB被赋值为 &#34;libio.a &#34;末尾有空格符号。
+</span><span class="c"># 在进行grep操作时，理所当然的出现问题。
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="变量的用途">变量的用途</h3>
+<p>变量可以用来保存简单的常数，也可以用来保存用户自定义的命令序列。例如：下面的设定可以用来汇报尚未使用的磁盘空间：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">DF</span> <span class="o">=</span> df
+<span class="nv">AWK</span> <span class="o">=</span> awk
+<span class="nv">free-space</span>	<span class="o">:=</span>	<span class="k">$(</span>DF<span class="k">)</span> . <span class="p">|</span> <span class="k">$(</span>AWK<span class="k">)</span> <span class="s1">&#39;NR == 2 {print $$4}&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>make的变量有两种类型</p>
+<p><strong>1.简单扩展的变量</strong>：可以使用<code>:=</code>赋值运算定义一个简单扩展的变量：<code>MAKE_DEPEND := $(CC) -M</code></p>
+<p>**2.递归扩展的变量：**可以使用<code>=</code>赋值运算定义一个经过递归扩展的变量：<code>MAKE_DEPEND = $(CC) -M</code></p>
+<h4 id="其他的赋值类型">其他的赋值类型</h4>
+<p>make除了提供<code>:= </code>, <code>= </code>两种赋值类型意外，还提供了<code>?=</code>,<code>+=</code>两种赋值类型。</p>
+<p><code>?=</code>类型为附带条件的变量赋值运算符号——条件赋值。此条件只会存在于变量的值尚不存在的状况下进行变量要求的赋值动作。</p>
+<p><code>+=</code>运算符通常被称为附加运算值，此运算符会将文本附加到变量里面。当递归变量被使用的时候，这就是个特别重要的特征了。赋值运算符右边的值会在“不影响变量中原有值的情况下”被附加到变量里。</p>
+<h3 id="宏">宏</h3>
+<p>变量适合存储单一行的值，如果涉及到的值为多行，例如命令脚本，就需要宏。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">define</span> <span class="err">create-jar</span>
+	<span class="err">@echo</span> <span class="err">Creating</span> <span class="k">$@</span><span class="err">...</span>
+	<span class="k">$(</span><span class="nv">RM</span><span class="k">)</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">MKDIR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">CP</span><span class="k">)</span> <span class="err">-r</span> <span class="err">$^</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+	<span class="err">cd</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span> <span class="err">&amp;&amp;</span> <span class="k">$(</span><span class="nv">JAR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">JARFLAGS</span><span class="k">)</span> <span class="k">$@</span>
+	<span class="k">$(</span><span class="nv">JAR</span><span class="k">)</span> <span class="err">-ufm</span> <span class="k">$@</span> <span class="k">$(</span><span class="nv">MAINFEST</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">RM</span><span class="k">)</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+<span class="err">endef</span>
+
+
+
+<span class="c">############	line	################
+</span><span class="c"></span>
+
+
+<span class="nf">$(UI_JAR)</span><span class="o">:</span><span class="k">$(</span><span class="nv">UI_CLASS</span><span class="k">)</span>
+	@<span class="k">$(</span>create-jar<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过将多个执行序列封装进一个宏中，减少了不必要的维护成本。需要注意的是<code>@</code>符号可以减少当前行的输出，如果把<code>@</code>放在宏的前面，就可以避免宏内部所有指令的输出。</p>
+<h3 id="何时扩展变量">何时扩展变量</h3>
+<p>扩展变量的规则是什么，这些规则有什么用处？当make运行的时候，会以两个阶段完成它的工作，首先会读取makefile以及被引入的任何其他makefile。第二个阶段make会分析易存图并判断需要更新的工作目标，然后执行脚本以完成需要更新的动作。</p>
+<p>当make处理递归变量或者define的时候，会将变量里的每一行或者宏的主体存储起来，包括行符号，但是不会进行扩展。</p>
+<p>当宏扩展的时候，make会立即扫描被扩展的文本中是否存在宏的变量的引用，如果存在就予以扩展，如此递归下去。如果宏是在命令脚本语境中被扩展的，则宏主体的每一行都会插入一个前导的跳格符。</p>
+<p>下面是如何用处理&rdquo;<strong>makefile中的元素何时被扩展</strong>&ldquo;的准则：</p>
+<ul>
+<li>对于变量赋值，make会在第一阶段读取改行的时候，立即扩展赋值运算符左边的部分；</li>
+<li>=和?=的右侧部分被延后到它们被使用的时候才扩展，并在第二阶段进行；</li>
+<li>:=的右边部分会立即扩展；</li>
+<li>如果+=的左边部分原本被定义为简单变量，+=右边部分会被立即扩展，否则，求值动作会延后；</li>
+<li>对于define定义的宏命令，宏的名称会被立即扩展。宏的主体会被延伸后到被使用的时候扩展；</li>
+<li>对于规则工作目标和必要条件总是会立即扩展，命令总是延后扩展；</li>
+</ul>
+<p>举个例子，第一阶段中进行变量的读取：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">BIN</span>	<span class="o">:=</span>	/usr/bin
+<span class="nv">PRINTF</span>	<span class="o">:=</span>	<span class="k">$(</span>BIN<span class="k">)</span>/printf
+<span class="nv">DF</span>	<span class="o">:=</span>	<span class="k">$(</span>BIN<span class="k">)</span>/df
+<span class="nv">AWK</span>	<span class="o">:=</span>	<span class="k">$(</span>BIN<span class="k">)</span>/awk
+
+<span class="c"># 我们定义了三个变量，都是简单变量。当make读取这几个变量的定义时候，它们的右边会被立即扩展。
+</span><span class="c"># BIN变量会被定义在其他三个变量之前，所以它们的值会被塞进其他三个变量里面
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 接下来，定义了free-space宏
+</span><span class="c"></span><span class="err">define</span> <span class="err">free-space</span>
+	<span class="k">$(</span><span class="nv">PRINTF</span><span class="k">)</span> <span class="s2">&#34;Free disk space &#34;</span>
+	<span class="k">$(</span><span class="nv">DF</span><span class="k">)</span> <span class="err">.</span> <span class="err">|</span> <span class="k">$(</span><span class="nv">AWK</span><span class="k">)</span> <span class="s1">&#39;NR == 2 (print $$4 )&#39;</span>
+<span class="err">endef</span>
+
+<span class="c"># 紧跟在define之后的变量名称会被立即扩展，但是就此例而言，并不需要扩展的东走。
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 最后使用free-space这个宏
+</span><span class="c"></span><span class="nv">OUTPUT_DIR</span>	<span class="o">:=</span>	/tmp
+<span class="nf">$(OUTPUT_DIR)/very_big_file</span><span class="o">:</span>
+	<span class="k">$(</span>free-space<span class="k">)</span>
+	
+<span class="c"># 当$(OUTPUT_DIR)/very_big_file被读取的时候，工作目标何必要条件中所有变量都会立即扩展。
+</span><span class="c"># 接着make会读取这个工作目标的命令脚本，会将前置跳格符的文本行视为命令行，不会进行扩展的动作。
+</span></code></pre></td></tr></table>
+</div>
+</div><p>第二阶段的进行中，也就是make读取进makefile中之后，make会对每个规则寻找工作目标。上述代码中只找到了<code>$(OUTPUT_DIR)/very_big_file</code>这个目标，因为这个工作目标没有存在于任何必要条件，make会将之扩展。</p>
+<blockquote>
+<p>实际上，makefile文件中有两处的次序很重要：如果BIN放在AWK后面，另外三个变量会依次被扩展为<code>/print,/df,/awk</code>，因为:=会使得make对赋值运算符右边部分立即进行求值的动作。</p>
+<p>如果目标OUTPUT_DIR的定义放在$(OUTPUT_DIR)/very_big_file之后，工作目标会被扩展为<code>/very_big_file</code>。</p>
+</blockquote>
+<h3 id="工作目标域模式的专属变量">工作目标域模式的专属变量</h3>
 <h2 id="13函数">1.3函数</h2>
 <h2 id="14命令">1.4命令</h2>
 <h1 id="第二章高级与特别的用法">第二章	高级与特别的用法</h1>
