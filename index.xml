@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>GUN Make 项目管理</title>
-      <link>https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</link>
+      <title>GNU Make 项目管理</title>
+      <link>https://foxi-yiyi.github.io/post/gnu.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</link>
       <pubDate>Fri, 28 Aug 2020 00:00:00 +0800</pubDate>
       
-      <guid>https://foxi-yiyi.github.io/post/gun.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</guid>
+      <guid>https://foxi-yiyi.github.io/post/gnu.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</guid>
       <description>第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp</description>
     </item>
     

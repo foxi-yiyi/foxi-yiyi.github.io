@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>GNU Make 项目管理 - Moeah&#39;s BLOG</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="foxi-yiyi" /><meta name="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="https://foxi-yiyi.github.io/post/gnu.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="GNU Make 项目管理" />
+<meta property="og:description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://foxi-yiyi.github.io/post/gnu.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" />
+<meta property="article:published_time" content="2020-08-28T00:00:00+08:00" />
+<meta property="article:modified_time" content="2020-08-28T00:00:00+08:00" />
+<meta itemprop="name" content="GNU Make 项目管理">
+<meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
+<meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
+<meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
+<meta itemprop="wordCount" content="10523">
+
+
+
+<meta itemprop="keywords" content="GNU Makefile," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="GNU Make 项目管理"/>
+<meta name="twitter:description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Moeah&#39;s BLOG</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Moeah&#39;s BLOG</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">GNU Make 项目管理</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-08-28 </span>
+        <div class="post-category">
+            <a href="/categories/computer-science/"> Computer Science </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#第一章规则">第一章	规则</a>
+      <ul>
+        <li><a href="#11规则">1.1规则</a>
+          <ul>
+            <li><a href="#具体规则">具体规则</a></li>
+            <li><a href="#通配符">通配符</a></li>
+            <li><a href="#假想工作目标">假想工作目标</a></li>
+            <li><a href="#空工作目标">空工作目标</a></li>
+            <li><a href="#变量">变量</a></li>
+            <li><a href="#自动变量"><strong>自动变量</strong></a></li>
+            <li><a href="#用vpath和vpath来查找文件"><strong>用VPATH和vpath来查找文件</strong></a></li>
+            <li><a href="#模式规则"><strong>模式规则</strong></a></li>
+            <li><a href="#隐含规则的结构">隐含规则的结构</a></li>
+            <li><a href="#特殊工作目标">特殊工作目标</a></li>
+            <li><a href="#自动生成依存关系">自动生成依存关系</a></li>
+            <li><a href="#双冒号规则">双冒号规则</a></li>
+          </ul>
+        </li>
+        <li><a href="#12变量与宏">1.2变量与宏</a>
+          <ul>
+            <li><a href="#变量的用途">变量的用途</a></li>
+            <li><a href="#宏">宏</a></li>
+            <li><a href="#何时扩展变量">何时扩展变量</a></li>
+            <li><a href="#工作目标域模式的专属变量">工作目标域模式的专属变量</a></li>
+            <li><a href="#变量来自何处">变量来自何处</a></li>
+            <li><a href="#条件指令的引入和引入指令的处理"><strong>条件指令的引入和引入指令的处理</strong></a></li>
+            <li><a href="#标准的make变量">标准的make变量</a></li>
+          </ul>
+        </li>
+        <li><a href="#13函数">1.3函数</a></li>
+        <li><a href="#14命令">1.4命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#第二章高级与特别的用法">第二章	高级与特别的用法</a>
+      <ul>
+        <li><a href="#21大型项目的管理">2.1大型项目的管理</a></li>
+        <li><a href="#22-可以移植性的makefile">2.2 可以移植性的makefile</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="第一章规则">第一章	规则</h1>
+<h2 id="11规则">1.1规则</h2>
+<h3 id="具体规则">具体规则</h3>
+<p>​	具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">vpath.o	variable.o	</span><span class="o">:</span>	<span class="n">make</span>.<span class="n">h</span> <span class="n">config</span>.<span class="n">h</span> <span class="n">dep</span>.<span class="n">h</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这代表vpath和variable使用的相同的文件。</p>
+<p>​	其实<strong>不必将所有的规则一次性全部定义</strong>，每当make看到一个工作目标，就会将工作目标和必要条件加入依存图。但是对于较复杂的应用来说，必要条件可以组成字看似毫无关联的文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 确定vpath.c被编译之前lexer.c就已经创建好了
+</span><span class="c"></span><span class="nf">vpath.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">c</span>
+<span class="err">...</span>
+
+<span class="c"># 用比较特殊的标记进行编译
+</span><span class="c"></span><span class="nf">vpath.o</span><span class="o">:</span><span class="n">vpath</span>.<span class="n">c</span>
+	<span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>RULE_FLAGS<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+<span class="err">...</span>
+
+<span class="c">#引入一个应用程序所产生的依存关系
+</span><span class="c"></span><span class="err">include</span> <span class="err">auto-generated-dependencies.d</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="通配符">通配符</h3>
+<p>​	当有一长串文件需要执行，而有不方便一一指定时，为了简化make的编写，可以采用通配符的方式。make的通配符如同shell的～，*，？，[&hellip;]，[/^&hellip;]。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">*.* 	: 	文件名中包含.号的所有文件；
+?	：	任何但一字符；
+<span class="o">[</span>...<span class="o">]</span>	:	代表一个字符集；
+<span class="o">[</span>^...<span class="o">]</span>	：	代表某个字符集的补集；
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="假想工作目标">假想工作目标</h3>
+<p>​	假想工作目标之所以较假想，是因为它不需要实际的工作目标。任何不代表文件的工作目标就叫做假想工作目标。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">clean</span><span class="o">:</span>
+	rm -rf *.o lexer.c
+</code></pre></td></tr></table>
+</div>
+</div><p>通常，make会执行假想工作目标，因为它并不会创建爱你医改工作目标为名词的文件。</p>
+<p><strong>需要注意的是：make无法区分文件形式的工作目标和假想工作目标</strong>。如果当前目录中有和假想名字相同的文件，make就会混淆无法区分。为了避免这个问题，GNU make体提供了一个特殊的工作目标 —— .PHONY，用来告诉make，该目标不是一个真正的文件而是一个假想工作目标。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">.PHONY</span><span class="o">:</span><span class="n">clean</span>
+<span class="nf">clean</span><span class="o">:</span>
+	rm -rf *.o lex.c
+</code></pre></td></tr></table>
+</div>
+</div><p>假想工作目标可以作为另一个工作目标的必要条件。可以让make在进行世纪工作目标之前调用假想工作目标所代表的脚本。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 示例一：
+</span><span class="c"></span><span class="nf">.PHONY</span><span class="o">:</span><span class="n">make</span>-<span class="n">documentation</span>
+<span class="nf">make-documentation</span><span class="o">:</span>
+	df -k . <span class="p">|</span> awk <span class="s1">&#39;NR == 2 ( printf(&#34;%d available\n&#34;, $$4) )&#39;</span>
+	....
+	
+<span class="c"># 示例二
+</span><span class="c"></span><span class="nf">.PHONY</span><span class="o">:</span><span class="n">make</span>-<span class="n">documentation</span>
+<span class="nf">make-documentation</span><span class="o">:</span><span class="n">df</span>
+	....
+
+<span class="nf">.PHONY</span><span class="o">:</span><span class="n">df</span>
+<span class="nf">df</span><span class="o">:</span>
+	df -k . <span class="p">|</span> awk <span class="s1">&#39;NR == 2 ( printf(&#34;%d available\n&#34;, $$4) )&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述示例1的问题在于：make-documentation中的命令在不同的环境运行需要做出不同的对应修改。如果全文后续省略部分有多处此命令，维护起来比较困难；如果将这句命令放在df的假想命令中，可以省去很多维护的麻烦。</p>
+<p>假想工作目标还有很多其他的好处。</p>
+<p>make的编写采用从上而下，执行采用从下而上。这么多层次的执行往往不好判断当前make运行的位置。采用假想工作目标可避免此问题。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">$(Program)</span><span class="o">:</span><span class="n">build_msg</span> <span class="k">$(</span><span class="nv">OBJETCS</span><span class="k">)</span> <span class="k">$(</span><span class="nv">BUILDINS_DEP</span><span class="k">)</span>
+	<span class="k">$(</span>RM<span class="k">)</span> <span class="nv">$@</span>
+	<span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="k">$(</span>Program<span class="k">)</span> <span class="k">$(</span>OBJETCS<span class="k">)</span> <span class="k">$(</span>LIBS<span class="k">)</span>
+	ls -al <span class="k">$(</span>Program<span class="k">)</span>
+	
+<span class="nf">.PHONY</span><span class="o">:</span><span class="n">build_msg</span>
+<span class="nf">build_msg</span><span class="o">:</span>
+	@printf <span class="s2">&#34;#\n# Building </span><span class="k">$(</span>Program<span class="k">)</span><span class="s2">\n #\n&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	由于printf在假想工作目标中，在任何必要条件更新时都会输出信息。如果以build_msg作为$(Program)命令脚本的第一个命令，那么所有编译结果和依存关系都产生后才会执行这个命令。<strong>由于假想工作目标总是尚未更新，所以假想目标build_msg会导致$(Program)被重建——即使已经被更新</strong>。这么做似乎很明智，所有的计算工作在编译文件时候已经基本完成了，因此只有最后的链接一定会被执行。</p>
+<h3 id="空工作目标">空工作目标</h3>
+<p>​	空工作目标可以用来发挥一些潜在的能力，前文指出：假想工作目标总是尚未更新，所以假想工作目标总是会被执行，并且总是会是的他们的依存对象被重建。当有些规则不会输出任何文件，只是偶尔被执行以下，并且不想让依存对象被更新。就可以建立空工作目标</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">prog</span><span class="o">:</span><span class="n">size</span> <span class="n">prog</span>.<span class="n">o</span>
+	<span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> $^
+	
+<span class="nf">size</span><span class="o">:</span><span class="n">prog</span>.<span class="n">o</span>
+	size $^
+	touch size
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="变量">变量</h3>
+<p>​	最简单的变量形如：<code>$(variable-name)</code>。</p>
+<p>​	这代表着任何文字都可以被包含在变量中，而且大多数字符都可以用在变量名称上，但是必须<strong>用$() 或 ${}括住</strong>，这样make才会认得。<strong>注意的是：但一字母的变量不要用$()括号的方式括住</strong>。</p>
+<h3 id="自动变量"><strong>自动变量</strong></h3>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>$@</strong></td>
+<td><strong>工作目标</strong>的名字</td>
+</tr>
+<tr>
+<td>$%</td>
+<td>档案文件成员结构中的文件名元素。</td>
+</tr>
+<tr>
+<td><strong>$&lt;</strong></td>
+<td><strong>第一个</strong>必要的文件名</td>
+</tr>
+<tr>
+<td>$?</td>
+<td>时间戳在工作目标之后的所有必要条件，并以空格隔开这些条件。</td>
+</tr>
+<tr>
+<td><strong>$^</strong></td>
+<td><strong>所有必要条件</strong>的文件名，并用空格分隔，<strong>去重</strong>。</td>
+</tr>
+<tr>
+<td><strong>$+</strong></td>
+<td>形式如$^:代表<strong>所有必要文件</strong>的名称，并用空格分隔，<strong>不去重</strong>。</td>
+</tr>
+<tr>
+<td>$*</td>
+<td>工作目标的主文件名，一个文件名称由两个部分形成：<strong>主文件名</strong>和<strong>扩展文件名</strong>。[<strong>请勿在模式规则以外使用此变量</strong>]</td>
+</tr>
+</tbody>
+</table>
+<p>具体形式如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">count_words</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">o</span> <span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+	gcc $^ -o <span class="nv">$@</span>
+
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">c</span>
+	gcc $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">c</span>
+	gcc $&lt;
+	
+<span class="nf">lexer.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">l</span>
+	flex -t $&lt; &gt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="用vpath和vpath来查找文件"><strong>用VPATH和vpath来查找文件</strong></h3>
+<p>​	有时候的真实情况比较复杂，所有的文件不是都存在同一个目录下的。接下来以重构refactor为例子，进行实际的文件布局。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;lexer.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;counter.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">counter</span><span class="p">(</span><span class="kt">int</span> <span class="n">counts</span><span class="p">[])</span>
+<span class="p">{</span>
+	<span class="k">while</span> <span class="p">(</span> <span class="n">yylex</span><span class="p">()</span> <span class="p">)</span>
+		<span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fee_count</span><span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fie</span> <span class="n">_count</span><span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">foe_count</span><span class="p">;</span>
+	<span class="n">counts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">fum_count</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	如果将其写成可重复使用的库函数，在头文件中应该要有一个声明，所以我们可以创建counter.h来包含这个声明：</p>
+<ul>
+<li>counter.h</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef COUNTER_H_
+</span><span class="cp">#define COUNTER_H_
+</span><span class="cp"></span>
+<span class="k">extern</span> <span class="kt">void</span>
+	<span class="nf">counter</span><span class="p">(</span> <span class="kt">int</span> <span class="n">counts</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="p">);</span>
+
+<span class="cp">#endif
+</span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>​	lexer.h</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef LEXER_H_
+</span><span class="cp">#define LEXER_H_
+</span><span class="cp"></span>
+<span class="k">extern</span> <span class="kt">int</span> <span class="n">fee_count</span><span class="p">,</span> <span class="n">fie_count</span><span class="p">,</span> <span class="n">foe_count</span><span class="p">,</span> <span class="n">fum_count</span><span class="p">;</span>
+<span class="k">extern</span> <span class="kt">int</span> <span class="nf">yylex</span><span class="p">(</span> <span class="kt">void</span> <span class="p">);</span>
+
+<span class="cp">#endif
+</span></code></pre></td></tr></table>
+</div>
+</div><p>​</p>
+<p>假设现在形成了如下的目录结构：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 目录结构示意</span>
+├── include
+│   ├── counter.h
+│   └── lexer.h
+├── Makefile
+└── src
+    ├── counter.c
+    ├── count_words.c
+    └── lexer.l
+</code></pre></td></tr></table>
+</div>
+</div><p>在更改了目录结构以后，代码的元文件都被安置在src目录，头文件都被安置在include目录。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 上述目录结构的makefile例子
+</span><span class="c"></span><span class="nv">CPPFLAGS</span> <span class="o">=</span> -I include
+<span class="nv">VPATH</span> <span class="o">=</span> src include
+
+<span class="nf">count_words</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">o</span> <span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+	gcc  $^ -o <span class="nv">$@</span>
+
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">couter</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">counter</span>.<span class="n">h</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.c</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">l</span>
+	flex -t $&lt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	上述makefile规定了VPATH 和 CPPFLAGS，用于告诉make编译时候需要寻找的路径。但是VPATH有个很大的问题 —— <del>无法处理不同目录下的同名文件</del>。make在找到多个不同目录下的同名文件时，会默认寻找第一个文件。可以采用如下指令语法：</p>
+<p>​										<code>VAPTH pattern directory-list</code></p>
+<p>现在可以将之前的path进行修改：相当于告诉了make应该在src中搜寻.c .l 文件，在include目录中搜寻 .h文件。(这样以来就可以在头文件中移除 include/xxx.h 字样)。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 上述目录结构的makefile例子
+</span><span class="c"></span><span class="nv">CPPFLAGS</span> <span class="o">=</span> -I include
+
+<span class="c"># VPATH pattern dir
+</span><span class="c"></span><span class="err">VPATH</span> <span class="err">*.h</span> <span class="err">include</span>
+<span class="err">VAPTH</span> <span class="err">*.c</span> <span class="err">*.l</span> <span class="err">src</span>     
+
+<span class="nf">count_words</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">o</span> <span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+	gcc  $^ -o <span class="nv">$@</span>
+
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">count_words</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">couter</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">counter</span>.<span class="n">h</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.o</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">c</span> <span class="n">include</span>/<span class="n">lexer</span>.<span class="n">h</span>
+	gcc -c $&lt; -o <span class="nv">$@</span>
+	
+<span class="nf">lexer.c</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">l</span>
+	flex -t $&lt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	总的来说使用VPATH解决<strong>源文件散落在多个目录中</strong>的问题，不过也可能出现仅用vpath无法解决的问题，稍后会接着讨论。</p>
+<h3 id="模式规则"><strong>模式规则</strong></h3>
+<p>上述例子中的makefile已经有点冗余了，如果整个工程非常庞大。千百个文件的对应关系都要手动一一指定，不仅麻烦也会占用大量的时间修正makefile。</p>
+<p>​	makefile可以使用文件名匹配的方式简化规则的建立，以及提供内置规则来处理。意思就是C语言的编译器会默认的将.c 文件编译成同名的.o文件；将.l文件编译成同名的.c文件。这就使得在书写makefile时有些必要条件的文件可以省略。举个例子上述makefile如果使用模式规则的方式进行简化：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 上述目录结构的makefile例子
+</span><span class="c"></span><span class="nv">vpath</span> <span class="o">=</span> src include 
+<span class="nv">CPPFLAGS</span> <span class="o">=</span> -I include
+
+<span class="nf">count_words</span><span class="o">:</span><span class="n">counter</span>.<span class="n">o</span> <span class="n">lexer</span>.<span class="n">o</span> -<span class="n">lfl</span>
+<span class="nf">count_words.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">h</span>
+<span class="nf">counter.o</span><span class="o">:</span><span class="n">counter</span>.<span class="n">h</span> <span class="n">lexer</span>.<span class="n">h</span>
+<span class="nf">lexer.c</span><span class="o">:</span><span class="n">lexer</span>.<span class="n">h</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	这里面所有的内置规则都是模式规则的实例。一个模式规则看起来就像一般的规则，只是主文件名被表示成%字符，正面这个makefile之所以可行是因为内部隐藏了三个内置规则：</p>
+<ol>
+<li>
+<p>*.c -&gt; *.o</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.o</span><span class="o">:</span>%.<span class="n">c</span>
+ <span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>*.l -&gt; *.c</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.c</span><span class="o">:</span>%.<span class="n">l</span>
+ @<span class="k">$(</span>RM<span class="k">)</span> <span class="nv">$@</span>
+ <span class="k">$(</span>LEX.l<span class="k">)</span> $&lt; &gt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>*.c -&gt; xxx</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%</span><span class="o">:</span>%.<span class="n">c</span>
+ <span class="k">$(</span>LINK.c<span class="k">)</span> $^ <span class="k">$(</span>LOADFILES<span class="k">)</span> <span class="k">$(</span>LDLIBS<span class="k">)</span> -o <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<h5 id="模式">模式</h5>
+<p>模式规则中的%符号，等效于unix中的*，可以代替任意多个字符。可以用在任何地方但是只能出现一次。文件名中%以外的模式匹配会按照字符一一匹配。</p>
+<h5 id="特定工作目标的静态规则">特定工作目标的静态规则</h5>
+<p>静态模式规则只能用在特定的工作目标上，且与其他规则的不同点就是前面多了一个$(OBJECTS)：规范。这就会使得该规则只能应用在$(OBJECTS)变量中所列举的文件上。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">$(OBJECTS)</span><span class="o">:</span>%.<span class="n">o</span>:%.<span class="n">c</span>
+	<span class="k">$(</span>CC<span class="k">)</span> -c <span class="k">$(</span>CPPFLAGS<span class="k">)</span> $&lt; -o <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>也就是说$(OBJECTS)中涉及到的所有的文件都适用这个规则。</p>
+<h5 id="后缀规则">后缀规则</h5>
+<p>后缀规则是用来定义隐含规则的最初方案，虽然不常用但是依旧会在某些时候见到这种用法。</p>
+<p>后缀规则中的工作目标，可以是一个或两个被衔接到一块的扩展名：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">.c.o</span><span class="o">:</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+	
+<span class="c"># 区别于之前介绍的模式规则
+</span><span class="c"></span>
+<span class="nf">%.o</span><span class="o">:</span>%.<span class="n">c</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+</code></pre></td></tr></table>
+</div>
+</div><p>后缀规则要求make中只会在这两个扩展名都在已知扩展名列表时，才将之视为后缀规则。</p>
+<h3 id="隐含规则的结构">隐含规则的结构</h3>
+<p>​	GNU make有90多个隐含规则，隐含规则并不是模式规则形式就是后缀规则的形式。这些内容的模式规则可应用于C，C++，Pascal，FORTRAN，ratfor，Modula等。如果使用这些工具的时候会发现make的内置规则中已经有了所需要的东西了。如果用到了未受支持的语言，比如java或者XML，就可能需要编写自己的规则了。当make检查一个工作目标时，如果找不到更新它的具体规则，就会使用内置的隐含规则。</p>
+<p>​	内置规则有标准的结构，方便用户进行自定义。下面的规则是从C源文件来更新目标文件的规则：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.o</span><span class="o">:</span>%.<span class="n">c</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+<span class="c"># 这个规则自定义取决于用到的变量。我们在此处看到了两个变量，其中一个COMPILE.c是由多个其他变量所定义的：
+</span><span class="c"></span>
+<span class="nv">COMPILE.c</span> <span class="o">=</span> <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> <span class="k">$(</span>TARGET_ARCH<span class="k">)</span> -c
+<span class="nv">CC</span> <span class="o">=</span> gcc
+<span class="nv">OUTPUT_OPTION</span> <span class="o">=</span> -o <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>只要修改了CC变量的设定值，就可以更换C的编译器。此外还包括用来设定编译选项的变量CFLAGS&hellip;</p>
+<p>​	在内置的规则中使用变量的目的，就是让规则的自定义尽可能简单。因此当需要在文件中自定义这些规则的时候，务必谨慎。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CPPFLAGS</span> <span class="o">=</span> -I project/includes
+</code></pre></td></tr></table>
+</div>
+</div><p>如果用户想在命令行上加入CPP的定义，一般会这样调用：<code>make CPPFLAGS=-DEBUG</code></p>
+<p>如果真的这么做了，会以外的删除编译时所需要的-I选项。命令行上所设定的变量会覆盖掉该变量原来的数值。所以不当的在makefile中设定CPPFLAGS会破坏用户预设的自定义结果。为了避免此类问题出现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">COMPILE.c</span> <span class="o">=</span> <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> <span class="k">$(</span>INCLUDES<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> <span class="k">$(</span>TARGET_ARCH<span class="k">)</span> -c
+<span class="nv">INCLUDES</span> <span class="o">=</span> -I project/include
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="特殊工作目标">特殊工作目标</h3>
+<p>特殊工作目标是一个内置的假象工作目标，用来变更make的默认行为。特殊工作目标的语法和一般工作目标的语法没有不同点，也就是<code>target : prerequisite</code>,但是target并非文件，而是一个假象工作目标。它们实际上是比较像用来修改make内部算法的指令。</p>
+<ul>
+<li>
+<p>.INTERMEDIATE:</p>
+<p>​		这个特殊工作目标的必要条件会被视为中间文件。如果make在更新另一个工作目标期间创建了该文件，则该文件将会在make运行结束时被自动删除。如果在make想要更新该文件之际该文件已经存在了，则该文件不会被删除。</p>
+</li>
+<li>
+<p>.SECONDARY:
+​		这个特殊工作目标的必要条件会被视为中间文件，但是不会被自动删除。.SECONDARY最常用来标示存储在程序库里的目标文件(object files)。按照惯例这些文件一旦被加入到档案库以后，就会被删除。在项目的开发期间保存这些文件，但是仍然使用make进行程序的更新，又是会比较方便。</p>
+</li>
+<li>
+<p>.PRECIOUS:</p>
+<p>​		当make期间中断时，如果自make启动以来该文件被修改过，make将会删除它正在更新的工作目标文件。因此不会在编译树中留下上位编译完成的文件，但是有时候却不希望make这么做。特别是在该文件很大而且编译代价也很大的时候。如果该文件几位珍贵，你就该用.PRECIOUS来标示它，这样的话make只有在自己信号被中断的时候才会这么做。</p>
+</li>
+<li>
+<p>.DELETE_ON_ERROR:</p>
+<p>​		.DELETE_ON_ERROR的作用和.PRECIOUS相反。将工作目标视为.DELETE_ON_ERROR，如果与规则响应的任何命令在运行时发生错误的话，就应该删除该工作目标文件。make通常只有在自己被信号中断时才会删除工作目标文件。</p>
+</li>
+</ul>
+<h3 id="自动生成依存关系">自动生成依存关系</h3>
+<p>​	在实际的工程环境中，会有个棘手的情况：大多数文件的头文件都会包含其他头文件从而生成结构复杂的树形结构。通过手动方式解析这些关系是一个令人绝望的事情。但是如果这些文件重新编译失败，可能会导致数小时的调试，此时该怎么处理呢？</p>
+<p>​	可以在make中加入一个include命令。如今大多数的make版本都支持include命令，GNU make当然一定支持这种方式。因此，诀窍就是编写一个makefile的工作目录，本工作目录的工作就是以-M选项对所有的源文件执行gcc命令，并将结果存入一个文件中(dependency file)，然后重新执行make以便于吧刚才产生的依存文件引入makefile，这样就可以触发所需要的更新：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">depend：count_word.c</span> <span class="err">lexer.c</span> <span class="err">counter.c</span>
+	<span class="k">$(</span><span class="nv">CC</span><span class="k">)</span> <span class="err">-M</span> <span class="k">$(</span><span class="nv">CPPFLAGS</span><span class="k">)</span> <span class="err">$^</span> <span class="err">&gt;</span> <span class="k">$@</span>
+<span class="err">include</span> <span class="err">depend</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>运行以前就应该执行make depend以产生依存关系。这么做虽然不错，但是当人们对源文件加入或者移除依存关系的时候，一般不会重新产生depend文件，这才会造成无法编译源文件。</p>
+<p>​	在GNU make中，可以简单地解决此问题：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">%.d</span><span class="o">:</span>%<span class="n">c</span>
+	<span class="k">$(</span>CC<span class="k">)</span> -M <span class="k">$(</span>CPPFLAGS<span class="k">)</span> $&lt; &gt; <span class="nv">$@</span>.<span class="nv">$$$$</span><span class="p">;</span>						<span class="se">\
+</span><span class="se"></span>	sed <span class="s1">&#39;s,\($*\)\.o[ :]*,\l.o $@ : ,g&#39;</span> &lt; <span class="nv">$@</span>.<span class="nv">$$$$</span> &gt; <span class="nv">$@</span><span class="p">;</span>		<span class="se">\
+</span><span class="se"></span>	rm -f <span class="nv">$@</span>.<span class="nv">$$$$</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这是一个令人印象深刻的小型命令脚本。首先会以 -M 的选项使用C编译器，以便创建一个包含此工作目标的依存关系的临时文件。该临时文件的名称由工作目标$@以及具唯一性的数字扩展名$$$$所组成。在shell中，变量$$会返回当前索引性的shell的进程编号。因为进程编号具有唯一性，所以这么做将可以产生一个独一无二的文件名。然后我们会使用sed以.d文件为工作目标加入此规划。</p>
+<p>sed表达式有搜索部分<code>\\($\*\)\.o[ :]\*</code>以及替换部分<code>\l.o $@ </code>：(以逗号为分隔符)组成。搜索表达式的开头是工作目标的主文件吗<code>$*</code>，被扩在正则表达式的分组<code>\(\)</code>中，后面跟着扩展名<code>\.o</code>。工作目标的文件名之后，将会出现0个或多个空格或冒号，即<code>[ :]*</code>。替换部分会通过引用第一个RE分组来做恢复最初的工作目标并且附加上扩展名，即<code>\l.o</code>，然后加入依存文件工作目标$@.</p>
+</blockquote>
+<h3 id="双冒号规则">双冒号规则</h3>
+<p>TO DO</p>
+<h2 id="12变量与宏">1.2变量与宏</h2>
+<p>截止目前已经看到了makefile的变量及其应用。但是上述所有的例子太过粗浅，变量和宏越多越复杂，GNU make的功能就越强大。</p>
+<p>在我们的任何讨论之前，最好能够了解make的两种语言：<strong>描述工作目标和必要条件组成的依存图</strong>；<strong>用于进行文字替换的宏语言</strong>。make允许为较长的字符定义简写并在程序中使用这个简写，宏处理器会认出这个简写并将它们替换为展开后的形式。</p>
+<p>一个变量的名称集合可以由任何长度的字符组成，包括大部分的标点符号。变量名称是<strong>区分大小写</strong>的，所以cc和CC所指的是不同的变量，要取得某个变量的值可以使用<code>$()</code>将变量包含在内部。(<strong>如果变量为单一字符，则可以省略括号</strong>)</p>
+<blockquote>
+<p>当变量用来表示<strong>用户在命令行上或者环境中自定义的常数时，习惯上全部大写字母，下划线符号<code>_</code>分隔</strong>;</p>
+<p>当变量用来表示<strong>只出现在makefile中的变量则会全部用小写字母来表示名字。单词之间用破折号<code>-</code>分隔</strong>。</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 常数
+</span><span class="c"></span><span class="err">CC</span>		<span class="err">：=</span> <span class="err">gcc</span>
+<span class="nv">MKDIR</span>	<span class="o">:=</span>	mkdir -p
+
+<span class="c"># 内部变量
+</span><span class="c"></span><span class="nv">source</span> 	<span class="o">=</span>	*.c
+<span class="nv">objects</span>	<span class="o">=</span>	<span class="k">$(</span>subst .c,.o,<span class="k">$(</span><span class="nb">source</span><span class="k">))</span>
+
+<span class="c"># 函数
+</span><span class="c"></span><span class="nv">maybe-make-dir</span>	<span class="o">=</span>	<span class="k">$(if</span> <span class="k">$(</span>wildcard <span class="nv">$1</span><span class="k">)</span>,,<span class="k">$(</span>MKDIR<span class="k">)</span> <span class="nv">$1</span><span class="k">)</span>
+<span class="nv">assert-not-null</span>	<span class="o">=</span>	<span class="k">$(if</span> <span class="nv">$1</span>,,<span class="k">$(</span>error illegal null value.<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>需要注意的是，在对变量进行赋值的时候。从作为赋值符号的<code>等号（=）</code>右侧第一个非空字符开始直至最后，都被赋值给这个变量，包括行末的空格符号。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">LIB</span> <span class="o">=</span> libio.a <span class="c1"># LIB的赋值末尾包含了一个空格符</span>
+<span class="nf">missing_file</span><span class="o">:</span>
+	touch <span class="k">$(</span>LIB<span class="k">)</span>
+		ls -al <span class="p">|</span> grep <span class="s1">&#39;$(LIB)&#39;</span>
+	
+<span class="c"># 上述makefile运行结果会出现问题，因为LIB被赋值为 &#34;libio.a &#34;末尾有空格符号。
+</span><span class="c"># 在进行grep操作时，理所当然的出现问题。
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="变量的用途">变量的用途</h3>
+<p>变量可以用来保存简单的常数，也可以用来保存用户自定义的命令序列。例如：下面的设定可以用来汇报尚未使用的磁盘空间：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">DF</span> <span class="o">=</span> df
+<span class="nv">AWK</span> <span class="o">=</span> awk
+<span class="nv">free-space</span>	<span class="o">:=</span>	<span class="k">$(</span>DF<span class="k">)</span> . <span class="p">|</span> <span class="k">$(</span>AWK<span class="k">)</span> <span class="s1">&#39;NR == 2 {print $$4}&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>make的变量有两种类型</p>
+<p><strong>1.简单扩展的变量</strong>：可以使用<code>:=</code>赋值运算定义一个简单扩展的变量：<code>MAKE_DEPEND := $(CC) -M</code></p>
+<p><strong>2.递归扩展的变量</strong>：可以使用<code>=</code>赋值运算定义一个经过递归扩展的变量：<code>MAKE_DEPEND = $(CC) -M</code></p>
+<h4 id="其他的赋值类型">其他的赋值类型</h4>
+<p>make除了提供<code>:= </code>, <code>= </code>两种赋值类型意外，还提供了<code>?=</code>,<code>+=</code>两种赋值类型。</p>
+<p><code>?=</code>类型为附带条件的变量赋值运算符号——条件赋值。此条件只会存在于变量的值尚不存在的状况下进行变量要求的赋值动作。</p>
+<p><code>+=</code>运算符通常被称为附加运算值，此运算符会将文本附加到变量里面。当递归变量被使用的时候，这就是个特别重要的特征了。赋值运算符右边的值会在“不影响变量中原有值的情况下”被附加到变量里。</p>
+<h3 id="宏">宏</h3>
+<p>变量适合存储单一行的值，如果涉及到的值为多行，例如命令脚本，就需要宏。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">define</span> <span class="err">create-jar</span>
+	<span class="err">@echo</span> <span class="err">Creating</span> <span class="k">$@</span><span class="err">...</span>
+	<span class="k">$(</span><span class="nv">RM</span><span class="k">)</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">MKDIR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">CP</span><span class="k">)</span> <span class="err">-r</span> <span class="err">$^</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+	<span class="err">cd</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span> <span class="err">&amp;&amp;</span> <span class="k">$(</span><span class="nv">JAR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">JARFLAGS</span><span class="k">)</span> <span class="k">$@</span>
+	<span class="k">$(</span><span class="nv">JAR</span><span class="k">)</span> <span class="err">-ufm</span> <span class="k">$@</span> <span class="k">$(</span><span class="nv">MAINFEST</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">RM</span><span class="k">)</span> <span class="k">$(</span><span class="nv">TMP_JAR_DIR</span><span class="k">)</span>
+<span class="err">endef</span>
+
+
+
+<span class="c">############	line	################
+</span><span class="c"></span>
+
+
+<span class="nf">$(UI_JAR)</span><span class="o">:</span><span class="k">$(</span><span class="nv">UI_CLASS</span><span class="k">)</span>
+	@<span class="k">$(</span>create-jar<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过将多个执行序列封装进一个宏中，减少了不必要的维护成本。需要注意的是<code>@</code>符号可以减少当前行的输出，如果把<code>@</code>放在宏的前面，就可以避免宏内部所有指令的输出。</p>
+<h3 id="何时扩展变量">何时扩展变量</h3>
+<p>扩展变量的规则是什么，这些规则有什么用处？当make运行的时候，会以两个阶段完成它的工作，首先会读取makefile以及被引入的任何其他makefile。第二个阶段make会分析易存图并判断需要更新的工作目标，然后执行脚本以完成需要更新的动作。</p>
+<p>当make处理递归变量或者define的时候，会将变量里的每一行或者宏的主体存储起来，包括行符号，但是不会进行扩展。</p>
+<p>当宏扩展的时候，make会立即扫描被扩展的文本中是否存在宏的变量的引用，如果存在就予以扩展，如此递归下去。如果宏是在命令脚本语境中被扩展的，则宏主体的每一行都会插入一个前导的跳格符。</p>
+<p>下面是如何用处理&rdquo;<strong>makefile中的元素何时被扩展</strong>&ldquo;的准则：</p>
+<ul>
+<li>对于变量赋值，make会在第一阶段读取改行的时候，立即扩展赋值运算符左边的部分；</li>
+<li>=和?=的右侧部分被延后到它们被使用的时候才扩展，并在第二阶段进行；</li>
+<li>:=的右边部分会立即扩展；</li>
+<li>如果+=的左边部分原本被定义为简单变量，+=右边部分会被立即扩展，否则，求值动作会延后；</li>
+<li>对于define定义的宏命令，宏的名称会被立即扩展。宏的主体会被延伸后到被使用的时候扩展；</li>
+<li>对于规则工作目标和必要条件总是会立即扩展，命令总是延后扩展；</li>
+</ul>
+<p>举个例子，第一阶段中进行变量的读取：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">BIN</span>	<span class="o">:=</span>	/usr/bin
+<span class="nv">PRINTF</span>	<span class="o">:=</span>	<span class="k">$(</span>BIN<span class="k">)</span>/printf
+<span class="nv">DF</span>	<span class="o">:=</span>	<span class="k">$(</span>BIN<span class="k">)</span>/df
+<span class="nv">AWK</span>	<span class="o">:=</span>	<span class="k">$(</span>BIN<span class="k">)</span>/awk
+
+<span class="c"># 我们定义了三个变量，都是简单变量。当make读取这几个变量的定义时候，它们的右边会被立即扩展。
+</span><span class="c"># BIN变量会被定义在其他三个变量之前，所以它们的值会被塞进其他三个变量里面
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 接下来，定义了free-space宏
+</span><span class="c"></span><span class="err">define</span> <span class="err">free-space</span>
+	<span class="k">$(</span><span class="nv">PRINTF</span><span class="k">)</span> <span class="s2">&#34;Free disk space &#34;</span>
+	<span class="k">$(</span><span class="nv">DF</span><span class="k">)</span> <span class="err">.</span> <span class="err">|</span> <span class="k">$(</span><span class="nv">AWK</span><span class="k">)</span> <span class="s1">&#39;NR == 2 (print $$4 )&#39;</span>
+<span class="err">endef</span>
+
+<span class="c"># 紧跟在define之后的变量名称会被立即扩展，但是就此例而言，并不需要扩展的东走。
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 最后使用free-space这个宏
+</span><span class="c"></span><span class="nv">OUTPUT_DIR</span>	<span class="o">:=</span>	/tmp
+<span class="nf">$(OUTPUT_DIR)/very_big_file</span><span class="o">:</span>
+	<span class="k">$(</span>free-space<span class="k">)</span>
+	
+<span class="c"># 当$(OUTPUT_DIR)/very_big_file被读取的时候，工作目标何必要条件中所有变量都会立即扩展。
+</span><span class="c"># 接着make会读取这个工作目标的命令脚本，会将前置跳格符的文本行视为命令行，不会进行扩展的动作。
+</span></code></pre></td></tr></table>
+</div>
+</div><p>第二阶段的进行中，也就是make读取进makefile中之后，make会对每个规则寻找工作目标。上述代码中只找到了<code>$(OUTPUT_DIR)/very_big_file</code>这个目标，因为这个工作目标没有存在于任何必要条件，make会将之扩展。</p>
+<blockquote>
+<p>实际上，makefile文件中有两处的次序很重要：如果BIN放在AWK后面，另外三个变量会依次被扩展为<code>/print,/df,/awk</code>，因为:=会使得make对赋值运算符右边部分立即进行求值的动作。</p>
+<p>如果目标OUTPUT_DIR的定义放在$(OUTPUT_DIR)/very_big_file之后，工作目标会被扩展为<code>/very_big_file</code>。</p>
+</blockquote>
+<h3 id="工作目标域模式的专属变量">工作目标域模式的专属变量</h3>
+<p>假设我们现在要便以一个需要额外命令行选项<code>-DUSE_NEW_MALLOC=1</code>的文件，但是其他的编译项目不需此选项。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">gui.o</span><span class="o">:</span><span class="n">gui</span>.<span class="n">h</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> -DUSE_NEW_MALLOC<span class="o">=</span><span class="m">1</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+</code></pre></td></tr></table>
+</div>
+</div><p>如上所示，只有一个文件需要此特殊操作的时候，可以单独将其列出来编译。但是如果涉及到很多的文件需要此类特殊的编译指令，整个makefile的维护就变得特别冗长。</p>
+<p>为此make提出了工作目标的专属变量。这些变量的定义会附加在工作目标上，而且只有在该工作目标以及相应的任何必要条件被处理的时候，它们才会发生作用。通过这个特性，可以改写为如下形式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">gui.o</span><span class="o">:</span><span class="n">CPPFLAGS</span> += <span class="n">_DUSE_NEW_MALLOC</span>=1
+<span class="nf">gui.o</span><span class="o">:</span><span class="n">gui</span>.<span class="n">h</span>
+	<span class="k">$(</span>COMPILE.c<span class="k">)</span> <span class="k">$(</span>OUTPUT_OPTION<span class="k">)</span> $&lt;
+</code></pre></td></tr></table>
+</div>
+</div><p>当make处理gui.o的时候，CPPFLAGS除了包含原有的内容，还会包含<code>-DUSE_NEW_MALLOC=1</code>。当make处理完gui.o这个目标以后，CPPFLAGS的值会恢复原有的内容。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile">	target... : <span class="nv">variable</span> <span class="o">=</span> value
+	target... : variable :<span class="o">=</span> value
+	target... : <span class="nv">variable</span> <span class="o">+=</span> value
+<span class="c"># 上述语法只能来定义工作目标的专属变量。此类变量再被赋值之前，并不需要实现存在。
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="变量来自何处">变量来自何处</h3>
+<p>make的变量可以来自如下几个来源：</p>
+<ul>
+<li>
+<p>文件</p>
+<p>​		变量可以被定义在makefile中，或者是被makefile引入(include指令)。</p>
+</li>
+<li>
+<p>命令行</p>
+<p>​		可以直接在make命令行定义或者重新定义变量：<code>make CFLAGS = -g</code></p>
+<p>​		每个命令行参数包含的等号=，都是一个变量赋值运算符。在命令行上，每个变量赋值运算符的右边必须是一个单独的shell参数。如果变量本身包括空格，需要使用<code>()或者{}</code>，或者避免使用空格。命令行上的变量赋值结果会覆盖掉环境变量以及makefile中的赋值结果。可以使用<code>:=、=</code>将命令行参数。设定成简单或递归命令。</p>
+<p>​</p>
+</li>
+<li>
+<p>环境</p>
+<p>​		make启动的时候，所有环境变量都会自动定义为make的变量。这些变量具有非常低的优先级，所以make文件或者命令行参数的赋值结果会覆盖掉环境变量的值。不过可以使用<code>-e</code>选项让环境变量覆盖掉makefile变量。</p>
+<p>​		当make被递归调用的时候，有若干来自上层make的变量会通过环境传递被下层的make。默认情况下，只有原先就来自环境变量的变量会被导出到下层的环境中。不过只要使用了<code>export</code>指令，就可以让任何变量被导出到环境之中。</p>
+</li>
+<li>
+<p>自动创建</p>
+<p>​		make会在执行一个规则的命令脚本之前创建自动变量。</p>
+</li>
+</ul>
+<h3 id="条件指令的引入和引入指令的处理"><strong>条件指令的引入和引入指令的处理</strong></h3>
+<h4 id="条件指令">条件指令</h4>
+<p>当make所读进的makefile使用了条件处理指令时，makefile文件中有些部分会被省略。有些部分的语法会被挑选出来。用来控制是否选择的条件具有各种形式，比如是否已经定义或是否等于。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># COMSPEC 只会在windows被定义
+</span><span class="c"></span><span class="err">ifdef</span> <span class="err">COMSPEC</span>
+	<span class="nv">PATH_SEP</span> <span class="o">:=</span> <span class="p">;</span>
+	EXE_EXT  :<span class="o">=</span> .exe
+<span class="err">else</span>
+	<span class="nv">PATH_SEP</span> <span class="o">:=</span> :
+	EXE_EXT :<span class="o">=</span>
+<span class="err">Endif</span>	
+</code></pre></td></tr></table>
+</div>
+</div><p>如果COMSPEC已经定义，则会选择条件指令的第一个分支。条件指令的基本语法如下所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">if-condition</span>
+	<span class="err">text</span> <span class="err">if</span> <span class="err">the</span> <span class="err">condition</span> <span class="err">is</span> <span class="err">true</span>
+<span class="err">endif</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>或者：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">if-condition</span>
+	<span class="err">text</span> <span class="err">if</span> <span class="err">the</span> <span class="err">condition</span> <span class="err">is</span> <span class="err">true</span>
+<span class="err">else</span>
+	<span class="err">text</span> <span class="err">if</span> <span class="err">the</span> <span class="err">condition</span> <span class="err">is</span> <span class="err">true</span>
+<span class="err">endif</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>if-condition可以使如下之一：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">ifdef</span> <span class="err">variable-name</span>
+<span class="err">ifndef</span> <span class="err">variable-name</span>
+<span class="err">ifeq</span> <span class="err">test</span>
+<span class="err">ifneq</span> <span class="err">test</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其中，条件处理命令可以用在宏定义和命令脚本中，还可以用在makefile的顶层：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">libGui.a</span><span class="o">:</span><span class="k">$(</span><span class="nv">gui_objects</span><span class="k">)</span>
+	<span class="k">$(</span>AR<span class="k">)</span> <span class="k">$(</span>ARFLAGS<span class="k">)</span> <span class="nv">$@</span> $&lt;
+	ifdef RANLIB
+		<span class="k">$(</span>RANLIB<span class="k">)</span> <span class="nv">$@</span>
+	endif
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">ifeq</span> <span class="err">(a,a)</span>
+	<span class="c"># these are equal
+</span><span class="c"></span><span class="err">endif</span>
+
+<span class="err">ifeq</span> <span class="err">(</span> <span class="err">b,b</span> <span class="err">)</span>
+	<span class="c"># These are not equal : &#39; b&#39; != &#39;b &#39;
+</span><span class="c"></span>	<span class="c1"># 值得注意的是，如果使用括号的模式，注意不要加空格。</span>
+<span class="err">endif</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述例子中不建议使用<code>(text,text)</code>的方式，会因为空格被混淆，建议采用“”方式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">ifeq</span> <span class="err">“a”</span> <span class="err">“a”</span>
+	<span class="c"># these are equal
+</span><span class="c"></span><span class="err">endif</span>
+
+<span class="err">ifeq</span> <span class="err">“b”</span> <span class="err">“b”</span> 
+	<span class="c"># These are equal 
+</span><span class="c"></span><span class="err">endif</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="include指令">include指令</h4>
+<p>一个makefile文件可以引入其他文件。此功能常用来引入make头文件中所存放的共同的make的定义，或者是用来自动生成依存关系的信息。include指令的用法如下：<code>include definitions.mk</code>。</p>
+<p>当make看到include指令的时候，会事先对通配符以及变量引用进行扩展的动作，然后试着读进引入文件。(include file)。如果这个文件存在整个过程会继续；然而，如果这个文件不存在，则make会汇报此问题并且继续读取其余的makefile。所有的makefile都被读完以后，make会从规则数据库中找出任何可用来更新引入文件的规则。如果找到了一个相符合的规则，make就会按照正常的步骤来更新工作目标。如果任何一个引入文件被规则更新，make就会接着清除内部数据库并重新读取这个makefile。</p>
+<p>makefile 范例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># 引入一个简单生成的文件
+</span><span class="c"></span><span class="err">include</span> <span class="err">foo.mk</span>
+<span class="k">$(</span><span class="nv">warning</span> <span class="nv">Finished</span> <span class="nv">include</span><span class="k">)</span>
+
+<span class="nf">foo.mk</span><span class="o">:</span><span class="n">bar</span>.<span class="n">mk</span>
+	m4 --define<span class="o">=</span><span class="nv">FILENAME</span><span class="o">=</span><span class="nv">$@</span> bar.mk &gt; <span class="nv">$@</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>bar.mk是一个文件引入的来源：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># bar.mk —— 读取时汇报信息
+</span><span class="c"></span><span class="k">$(</span><span class="nv">warning</span> <span class="nv">Reading</span> <span class="nv">FILENAME</span><span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>整个流程的运行结果如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ make
+Makefile:2: foo.mk: No such file or directory
+Makefile:3: Finished include
+m4 --define<span class="o">=</span><span class="nv">FILENAME</span><span class="o">=</span>foo.mk bar.mk &gt; foo.mk
+foo.mk:2: Reading foo.mk
+Makefile:3: Finished include
+make: <span class="s1">&#39;foo.mk&#39;</span> is up to date.
+</code></pre></td></tr></table>
+</div>
+</div><p>首先执行了make命令以后，include foo.mk会尝试引入foo.mk文件。但是显示的是make并未找到文件，第二行还是会继续读取以及执行makefile。完成读取动作以后，make找到了一个创建foo.mk的规则，所以就会接着执行创建foo.mk的指令。然后整个make会重新开始整个过程，这次依次读取引入文件不会遇到任何困难。</p>
+<p>make会如何找到引入文件？如果include引入的是一个绝对路径，make自然会按照路径去寻找。如果这是一个相对的文件引用，make对在当前目录中寻找文件；如果寻找失败了，会接着道&ndash;include-dir选项指定的目录继续查找。如果<strong>希望include忽略不存在的文件，即可在include前面加一个破折号</strong>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-make" data-lang="make"><span class="err">-include</span> <span class="err">i-my-not-exists.mk</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="标准的make变量">标准的make变量</h3>
+<p>除了自动变量，make还会为“自己的状态以及内置规则的定义”提供变量，以便对外提供相关信息：</p>
+<ul>
+<li>
+<p>MAKE_VERSION</p>
+<p>使用此变量来查看当前所运行的make的版本编号</p>
+</li>
+<li>
+<p>CURDIR</p>
+<p>正在执行make进程的当前工作目录。这个变量和shell的pwd命令相同，除非make在运行时遇到了<code>--directory</code>选项。假如有一个项目是用java写的，并且在顶层目录使用了一个makefile。此时，如果使用了<code>--directory</code>选项，不管我是从源代码哪个目录来调用make，仍然能够访问这个makefile。在makefile文件中，所有路径都应该被设定成相对于makefile所在的目录。需要使用绝对路径的时候则可以通过CURDIR访问。</p>
+</li>
+<li>
+<p>MAKEFILE_LIST</p>
+<p>make所读进的各个makefile文件的名称所构成的列表，包括默认的makefile以及命令行或者include指令所指定的makefile。在每个makefile被读进make之前，其文件名会被附加到MAKEFILE_LIST变量里。所以任何一个makefile总是可以查看此列表的最后一项来查看自己的文件名。</p>
+</li>
+<li>
+<p>MAKECMDGOALS</p>
+<p>当前运行的make而言，make运行时命令上指定了哪些工作目标。此变量并非不包含命令行选项或者变量的赋值。当工作目标需要特别的处理时，通常会使用MAKECMDGOALS。常见的例子是“clean”工作目标。当用户以“clean”调用make时，make不应该像平常那样进行有include指令触发的一寸文件产生动作。要避免此事可以使用ifneq和MAKECMDGOALS</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">idneq</span>  <span class="s2">&#34;$(MAKECMDGOALS)&#34;</span> <span class="s2">&#34;clean&#34;</span>
+  <span class="err">-include</span> <span class="k">$(</span><span class="nv">subst</span> .<span class="nv">xml</span>,.<span class="nv">d</span>,<span class="k">$(</span><span class="nv">xml_src</span><span class="k">))</span>
+<span class="err">endif</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>.VARIABLES</p>
+<p>到目前为止，make从各个文件所读取的变量的名称构成的列表，不含工作目标的专属变量。</p>
+</li>
+</ul>
+<h2 id="13函数">1.3函数</h2>
+<h2 id="14命令">1.4命令</h2>
+<h1 id="第二章高级与特别的用法">第二章	高级与特别的用法</h1>
+<h2 id="21大型项目的管理">2.1大型项目的管理</h2>
+<h2 id="22-可以移植性的makefile">2.2 可以移植性的makefile</h2>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">foxi-yiyi</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-08-28
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">Moeah</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/gnu-makefile/">GNU Makefile</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/c%E8%AF%AD%E8%A8%80%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88/">
+            <span class="next-text nav-default">C语言：什么是指针，自己的小理解</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="https://foxi-yiyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">foxi-yiyi</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
