@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="10523">
+<meta itemprop="wordCount" content="12574">
 
 
 
@@ -168,7 +168,12 @@
             <li><a href="#标准的make变量">标准的make变量</a></li>
           </ul>
         </li>
-        <li><a href="#13函数">1.3函数</a></li>
+        <li><a href="#13函数">1.3函数</a>
+          <ul>
+            <li><a href="#用户自定义函数">用户自定义函数</a></li>
+            <li><a href="#内置函数"><strong>内置函数</strong></a></li>
+          </ul>
+        </li>
         <li><a href="#14命令">1.4命令</a></li>
       </ul>
     </li>
@@ -1326,6 +1331,251 @@ make: <span class="s1">&#39;foo.mk&#39;</span> is up to date.
 </li>
 </ul>
 <h2 id="13函数">1.3函数</h2>
+<h3 id="用户自定义函数">用户自定义函数</h3>
+<p>用户自定义函数能够将命令序列存储在变量里面，让我们得以在makefile中使用各种应用程序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">AWK</span>		<span class="o">:=</span>	awk
+<span class="nv">KILL</span>	<span class="o">:=</span>	<span class="nb">kill</span>
+
+<span class="c">#$(kill-acroread)
+</span><span class="c"></span><span class="err">define</span> <span class="err">kill-acroread</span>
+	<span class="err">@</span> <span class="err">ps</span> <span class="err">-W</span> <span class="err">|</span>											<span class="err">\</span>
+	<span class="k">$(</span><span class="nv">WAK</span><span class="k">)</span> <span class="s1">&#39;BEGIN		{FILEDWIDTHS = &#34;9 47 100&#34;}		\
+</span><span class="s1">			/AcroRd32/	{								\
+</span><span class="s1">                			print &#34;Killing &#34; $$3;		\
+</span><span class="s1">                			system(&#34;$(KILL) -f &#34; $$1)	\
+</span><span class="s1">						}&#39;</span>
+<span class="err">endef</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>对于常用的脚本，宏是一种很好用的措施。可以使用define避免重复。但是这么做并不完美：如果我们要终止Acrobat Reader以外的程序，该怎么处理呢？难道还需要重复的脚本来定义另一个宏？当然不。。。</p>
+<p>可以传递参数给变量和宏。宏的参数在定义的时候一次可以用$1,$2等进行引用。如果想让kill-acroread函数使用参数，只需要加入一个搜索参数即可。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">AWK</span>			<span class="o">:=</span>	awk
+<span class="nv">KILL</span>		<span class="o">:=</span>	<span class="nb">kill</span>
+<span class="nv">KILL_FLAGS</span>	<span class="o">:=</span>	-f
+<span class="nv">PS</span>			<span class="o">:=</span>	ps
+<span class="nv">PS_FLAGS</span>	<span class="o">:=</span>	-W
+<span class="nv">PS_FIELDS</span>	<span class="o">:=</span>	<span class="s2">&#34;9 47 100&#34;</span>
+
+<span class="c">#$(call kill-program,awk-pattern)
+</span><span class="c"></span><span class="err">define</span> <span class="err">kill-program</span>
+	<span class="err">@</span> <span class="k">$(</span><span class="nv">PS</span><span class="k">)</span> <span class="k">$(</span><span class="nv">PS_FLAGS</span><span class="k">)</span>									<span class="err">\</span>
+	<span class="k">$(</span><span class="nv">WAK</span><span class="k">)</span> <span class="s1">&#39;BEGIN	{FILEDWIDTHS = &#34;9 47 100&#34;}			\
+</span><span class="s1">			/$1/		{								\
+</span><span class="s1">                print &#34;Killing &#34; $$3;					\
+</span><span class="s1">                system(&#34;$(KILL) $(KILL_FLAGS) &#34; $$1)	\
+</span><span class="s1">						}&#39;</span>
+<span class="err">endef</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里使用了一个参数引用$1来取代AWK的搜索模式/AcroRd32/。注意含参数$1和awk字段参数$$1之间的细微差别，要时刻谨记“哪个程序是变量引用的接受者”是一个非常重要的事情。</p>
+<p>如下例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">FOP</span>			<span class="o">:=</span>	org.apache.fop.apps.Fop
+<span class="nv">FOP_FLAGS</span>	<span class="o">:=</span>	-q
+<span class="nv">FOP_OUTPUT</span>	<span class="o">:=</span>	&gt;	/dev/null
+<span class="nf">%.pdf</span><span class="o">:</span>	%.<span class="n">fo</span>
+	<span class="k">$(</span>call kill-program,AcroRd32<span class="k">)</span>
+	<span class="k">$(</span>JAVA<span class="k">)</span> <span class="k">$(</span>FOP<span class="k">)</span> <span class="k">$(</span>FOP_FLAGS<span class="k">)</span> $&lt; <span class="nv">$@</span> <span class="k">$(</span>FOP_OUTPUT<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>此模式规则首先会终止Acroba进程，如果正在运行，会使用Fop处理器吧fo文件转换成pdf文件。其中用来扩展变量或者宏的语法如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="k">$(</span><span class="nv">call</span> <span class="nv">macro</span>-<span class="nv">name</span>[, <span class="nv">param</span>1 ...]<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>call是一个内置的make函数，call会扩展它的第一个参数并将其余参数一次替换到出现$1,$2&hellip;的地方。macro-name可以指任何一个宏或者变量的名称。宏或者变量的值中不必包含任何的$n引用，如果是这样的话，使用call几乎没有什么意义。macro-name之后是宏的参数，并以逗号为分隔符。</p>
+<p>请注意，call的第一个参数是一个非扩展式的变量名称，这种状况并不常见。origin是另一个可以接受非扩展式变量名称的内置函数。如果为call的第一个参数加上一个美元符号或者圆括号，该参数就会像变量一样被扩展，它的值就会被传给call。</p>
+<p>call的参数检查机制非常简单。可以为call指定任意多个参数。如果一个宏引用了一个参数$n,但是调用的call实例并未指定相应的参数，呢么改变了就会变为空值。如果call实例所指定的参数比宏$n还多，name在宏中并不会扩展额外的参数。</p>
+<p>如果使用一个宏引用另一个宏，被调用者将可以在它的宏被扩展期间看到调用者的参数：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">define</span> <span class="err">parent</span>
+	<span class="nf">echo &#34;parent has two parameters</span><span class="o">:</span> $1<span class="p">,</span>$2&#34;
+	<span class="k">$(</span>call child,<span class="nv">$1</span><span class="k">)</span>
+<span class="err">endef</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">define</span> <span class="err">child</span>
+	<span class="nf">echo &#34;child has one paramter </span><span class="o">:</span> $1&#34;
+	<span class="nb">echo</span> <span class="s2">&#34;but child can also see parent&#39;s second parameter:</span><span class="nv">$2</span><span class="s2">!&#34;</span>
+<span class="err">endef</span>
+
+<span class="nf">scoping_issue</span><span class="o">:</span>
+	@<span class="k">$(</span>call parent,one,two<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>对此makefile运行make就可以看到这个宏实现具有可见性的问题</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">$</span> <span class="err">make</span>
+<span class="nf">parent has two parameters</span><span class="o">:</span><span class="n">one</span><span class="p">,</span><span class="n">two</span>
+<span class="nf">child has one parameter</span><span class="o">:</span><span class="n">one</span>
+<span class="nf">but child can also see parent&#39;s second parameter</span><span class="o">:</span><span class="n">two</span>!
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="内置函数"><strong>内置函数</strong></h3>
+<p>GNU提供了很多内置函数可以让我们来操作变量和他们的内容。make的函数可以分为：字符串操作、文件名操作、流程控制、用户自定义函数和若干杂项函数。</p>
+<p>首先可以多了解一点函数的语法。所有的函数都会行程如下形式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="k">$(</span><span class="nv">function</span>-<span class="nv">name</span> <span class="nv">arg</span>1[, <span class="nv">argn</span>]<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>$(之后是内置函数的名称，接着是函数的参数。第一个参数的前导空格会被删除，但是后续的任何参数若包含前导空格都会被保留下来。</p>
+<p>函数的参数是以括号为分隔符，所以只有一个参数的函数并不需要使用逗号，具有两个参数的函数需要使用一个逗号，以此类推。许多只接受一个参数的函数会把它的参数视为一串以空格为分隔符的单词。对于这些函数而言，他们会以空格作为分隔符。</p>
+<p>make有很多参数允许以模式为参数，此模式的语法如同模式规则中所使用的模式。模式中可以包含一个%符号，以及前导或者跟在后面的字符。%字符代表零个或者多个任何类型的字符。进行目标字符串匹配时，此模式必须匹配整个字符串，而不是字符串的子集。</p>
+<h4 id="字符串函数"><strong>字符串函数</strong></h4>
+<p>make内置的函数大部分都可以操作两种形式的文本，不过有些函数具有特别强的字符串处理能力，这就是要探讨的内容。</p>
+<p>在make中常见的字符串函数操作就是从一份文件列表中选出一组文件，shell脚本中之所以常会用到grep就是这个原因。在make中我们有filter、filter-out、findstring等函数可用。</p>
+<ul>
+<li>
+<p>$(filter pattern &hellip;,text)</p>
+<p>filter函数会将text视为一系列被空格隔开的单词，与pattern比较以后，接着会返回相符者。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">$(ui_library) </span><span class="o">:</span> <span class="k">$(</span><span class="nv">filter</span> <span class="nv">ui</span>/%.<span class="nv">o</span>,<span class="k">$(</span><span class="nv">objects</span><span class="k">))</span>
+  <span class="k">$(</span>AR<span class="k">)</span> <span class="k">$(</span>ARFLAGS<span class="k">)</span> <span class="nv">$@</span> $^
+</code></pre></td></tr></table>
+</div>
+</div><p>上述例子当中，是为了建立用户界面的程序库，我们可能指向从ui子目录中选出目标文件。接下来会文件名列表中去除开头为ui/结尾为.o的文件名。%字符会将其中任意多个字符匹配。</p>
+<p>filter还可以接受多个格式。前文说过格式必须是整个单词，才可以将相符的单词放到输出列表中。所有如下的例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">words</span> <span class="o">:=</span> he the hen other the%
+<span class="nf">get-the</span><span class="o">:</span>
+  @echo he matches:	<span class="k">$(</span>filter he, <span class="k">$(</span>words<span class="k">))</span>
+  @echo %he matches:	<span class="k">$(</span>filter %he, <span class="k">$(</span>words<span class="k">))</span>
+  @echo he% matches:	<span class="k">$(</span>filter he%, <span class="k">$(</span>words<span class="k">))</span>
+  @echo %he% matches:	<span class="k">$(</span>filter %he%, <span class="k">$(</span>words<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>运行后会出现如下结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ make
+he matches: he
+%he matches: he the
+he% matches: he hen
+%he% matches: the%
+
+<span class="c1"># 需要注意的是filter中的模式匹配，只能识别第一个%通配符，第二个%只能作为普通字符参与其中。</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>$(filter-out pattern &hellip;,text)</p>
+<p>filter-out函数所做的事刚好和filter相反，用来选出与模式不相符的每个单词。所以下面的例子可以从文件名列表中选出所有非C头文件的文件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">all_source</span>	<span class="o">:=</span>	count_words.c counter.c lexer.l counter.h lexer.h
+<span class="nv">to_compile</span>	<span class="o">:=</span>	<span class="k">$(</span>filter-out %.h, <span class="k">$(</span>all_source<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>$(findstring pattern &hellip;,text)</p>
+</li>
+</ul>
 <h2 id="14命令">1.4命令</h2>
 <h1 id="第二章高级与特别的用法">第二章	高级与特别的用法</h1>
 <h2 id="21大型项目的管理">2.1大型项目的管理</h2>
