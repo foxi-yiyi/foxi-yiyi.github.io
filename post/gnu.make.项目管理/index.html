@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="12574">
+<meta itemprop="wordCount" content="17008">
 
 
 
@@ -172,6 +172,10 @@
           <ul>
             <li><a href="#用户自定义函数">用户自定义函数</a></li>
             <li><a href="#内置函数"><strong>内置函数</strong></a></li>
+            <li><a href="#高级用户自定义函数">高级用户自定义函数</a></li>
+            <li><a href="#eval与value函数">eval与value函数</a></li>
+            <li><a href="#函数倒挂">函数倒挂</a></li>
+            <li><a href="#传递参数">传递参数</a></li>
           </ul>
         </li>
         <li><a href="#14命令">1.4命令</a></li>
@@ -1574,13 +1578,549 @@ he% matches: he hen
 </div></li>
 <li>
 <p><strong>$(findstring pattern &hellip;,text)</strong></p>
+<p>这个函数会在text中搜索string，如果这个字符串被找到了，此函数会返回string。否则将会返回空值。</p>
+<p>需要注意的是，这个函数不同于grep。此函数只会返回“搜索字符串”，而非它所找到的包含该“搜索字符串”的单词。其次，“搜索字符串无法包含通配符。</p>
+</li>
+<li>
+<p><strong>$(subst search-string, replace-string, text)</strong></p>
+<p>这是一个不具备通配符能力的“搜索和替换”函数。它最常被用来在文件名列表中将一个扩展名替换为另一个扩展名。需要注意的是，这里采用的是全局替换策略。而且空格也会被识别为字符串的一部分。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">sources</span>	<span class="o">:=</span>	count_words.c counter.c lexer.c
+<span class="nv">objects</span>	<span class="o">:=</span>	<span class="k">$(</span>subst .c,.o <span class="k">$(</span>sources<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><strong>$(patsubst search-pattern,replace-pattern,text)</strong></p>
+<p>这是一个具有通配能力的“搜索和替换函数”。照例，此处的模式可以包含一个%符号。replace-pattern的百分比符号会被扩大成与模式相符的文字。切记search-pattern必须和text整个值进行匹配。例如，下面的例子就会删除text结尾的斜线符号，而不是每一个斜线符号。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">strip-trailing-slash</span> <span class="o">=</span> <span class="k">$(</span>patsubst %/,%,<span class="k">$(</span>sirectory-path<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><strong>$(words text)</strong></p>
+<p>此函数会返回text中单词的数量。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CURRENT_PATH</span> <span class="o">:=</span> <span class="k">$(</span>subst /, ,<span class="k">$(</span>HOME<span class="k">))</span>
+<span class="nf">words</span><span class="o">:</span>
+  @echo MY HOME path has <span class="k">$(</span>words <span class="k">$(</span>CURRENT_PATH<span class="k">)</span> directories<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><strong>$(words n,text)</strong></p>
+<p>此函数会返回text中的第n个单词，第一个单词的编号是1。如果n的值大雨text中单词的个数，则此函数将会返回空值。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">version_list</span> <span class="o">:=</span> <span class="k">$(</span>sbust ., ,<span class="k">$(</span>MAKE_VERSION<span class="k">))</span>
+<span class="nv">minor_version</span> <span class="o">:=</span> <span class="k">$(</span>word 2, <span class="k">$(</span>version_list<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><strong>$(firstword text)</strong></p>
+<p>此函数会返回text中的第一个单词。此功能等效于$(word 1,text)。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">version_list</span>	<span class="o">:=</span>	<span class="k">$(</span>subst ., ,<span class="k">$(</span>MAKEVERSION<span class="k">))</span>
+<span class="nv">major_version</span>	<span class="o">:=</span>	<span class="k">$(</span>firstword <span class="k">$(</span>version_list<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><strong>$(wordlist start,end,text)</strong></p>
+<p>此函数会返回text中范围从start(包含)到end(包含)的单词。如同word函数，第一个单词的编号是1。如果start的值大于单词的个数，则函数所返回的是空值；如果end的值大于单词的个数，则函数将会自start开始返回所有单词。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(call uid_gid, user-name)
+</span><span class="c"></span><span class="nv">uid_gid</span>	<span class="o">=</span>	<span class="k">$(</span>wordlist 3, 4, <span class="se">\
+</span><span class="se"></span>          <span class="k">$(</span>subst :, ,  <span class="se">\
+</span><span class="se"></span>          <span class="k">$(</span>shell grep <span class="s2">&#34;^</span><span class="nv">$1</span><span class="s2">:&#34;</span> /etc/passwd<span class="k">)</span><span class="o">))</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h4 id="文件名函数"><strong>文件名函数</strong></h4>
+<ul>
+<li>
+<p><strong>$(wildcard pattern)</strong></p>
+<p>第二章曾经提到过，通配符可能被用于工作目标，必要条件以及命令脚本等语境中。但是如果我们想将此功能用在其他语境中，例如变量定义，该怎么办？使用shell函数，我们可以通过subshell函数扩展模式。此时我们可以使用wildcard函数：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">sources</span>	<span class="o">:=</span> 	<span class="k">$(</span>wildcard *.c *.h<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><strong>$(dir list)</strong></p>
+<p>dir函数会返回list中每个单词的目录部分。下面的用户自定义函数会返回包含C源文件的每个子目录：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">source-dirs</span>	<span class="o">:=</span>	<span class="k">$(</span>sort				<span class="se">\
+</span><span class="se"></span>                  <span class="k">$(</span>dir			<span class="se">\
+</span><span class="se"></span>                      <span class="k">$(</span>shell find <span class="nv">$1</span> -name <span class="s1">&#39;*.c&#39;</span><span class="k">)</span><span class="o">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>find命令会返回当前目录中所有C源文件的文件路径，接着dir函数删掉文件名保留目录的部分，最后由sort函数移除重复的部分。</p>
+</li>
+<li>
+<p>**$(notdir name) **</p>
+<p>notdir函数会返回文件路径的文件名部分。例如，下面的用户自定义函数会从搞一个Java源文件返回java的类名称：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(call get-java-class-name, file-name)
+</span><span class="c"></span><span class="nv">get-java-class-name</span>	<span class="o">=</span>	<span class="k">$(</span>notdir <span class="k">$(</span>subst .java,,<span class="nv">$1</span><span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h4 id="流程控制函数"><strong>流程控制函数</strong></h4>
+<ul>
+<li>
+<p><strong>$(if condition,then-part,else-part)</strong></p>
+<p>if函数(不要跟第三章所提交的条件指令ifeq，ifne，ifdef和ifndef搞混了)会根据条件表达式的求值结果，从两个宏中选出来一个进行扩展的动作。如果condition扩展之后包含任何字符，那么他的求值结果为“真”，于是会对then-part进行扩展的动作；否则，如果condition扩展之后会空无一物，那么他的求值结果为假，于是会对else-part进行扩展的动作。</p>
+</li>
+<li>
+<p><strong>$(error text)</strong></p>
+<p>error函数可用来输出“无可挽回的”错误信息。在此函数输出信息之后，make将会以这两个结果结束状态进行终止运行。输出中包含当前makefile的名称，当前的行号以及消息正文。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(call assert,condition,massage)
+</span><span class="c"></span><span class="err">define</span> <span class="err">assert</span>
+  <span class="nf">$(if $1,,$(error Asserting fialed</span><span class="o">:</span> $2))
+<span class="err">endef</span>
+<span class="c"># $(call assert,$(wildcard $1),$1 does not exist)
+</span><span class="c"></span><span class="err">endef</span>
+<span class="c"># $(call assert-not-null,make-variable)
+</span><span class="c"></span><span class="err">define</span> <span class="err">assert-not-null</span>
+  <span class="k">$(</span><span class="nv">call</span> <span class="nv">assert</span>,<span class="k">$($</span>1<span class="k">))</span><span class="err">,The</span> <span class="err">variable</span> <span class="s2">&#34;$1&#34;</span> <span class="err">is</span> <span class="err">null)</span>
+<span class="err">endef</span>
+<span class="nf">error-exit</span><span class="o">:</span>
+  <span class="k">$(</span>call assert-not-null,NON_EXSITENT<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>第一个函数assert只会测试它的第一个参数，如果该参数是空的，则会输出用户的错误信息。第二个函数建立在第一个函数至上，他会以通配模式来测试文件是否存在。</p>
+<p>第三个函数是一个非常有用的断言，这是一个基于“经求值的变量”的函数。一个make变量可以包含任何内容，包括另一个make变量的名称。</p>
+</li>
+<li>
+<p><strong>$(foreach variable,list,body)</strong></p>
+<p>这个函数可以让你在反复扩展文本的时候，将不同的值替换进去。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">letters</span>	<span class="o">:=</span>	<span class="k">$(</span>foreach letter,a b c d,<span class="k">$(</span>letter<span class="k">))</span>
+<span class="nf">show-words</span><span class="o">:</span>
+  <span class="c1"># letters has $(words $(letters)) words: &#39;$(letters)&#39;</span>
+  	
+<span class="err">$</span> <span class="err">make</span>
+<span class="c"># letter has 4 words: &#39;a b c d&#39;
+</span></code></pre></td></tr></table>
+</div>
+</div><p>当这个foreach函数被执行的时候，他会反复的扩展循环主体$(letter)，并且将循环控制变量letter的值一次设定为a,b,c,d。每次扩展所得到的文本会被积累起来，并以空格为分隔符。</p>
+<h3 id="高级用户自定义函数">高级用户自定义函数</h3>
+<p>在实际的使用过程中，可能会花费大量的时间在宏函数的编写上面，可惜的是，make不会提供多少可以协助我们调试的功能。可以从编写一个简单的调试追踪函数以协助我们摆脱这个困境。</p>
+<p>如前文，所示call函数会把它的每个参数依次绑定到$1，$2等编号变量。可以为call函数指定任意多个参数，还可以通过$0来访问当前所执行的函数的名称。</p>
 </li>
 </ul>
-<h2 id="14命令">1.4命令</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(debug_enter）
+</span><span class="c"></span><span class="nv">debug-enter</span>	<span class="o">=</span>	<span class="k">$(if</span> <span class="k">$(</span>debug_trace<span class="k">)</span>,	<span class="se">\
+</span><span class="se"></span>					<span class="k">$(</span>warning Entering <span class="nv">$0</span><span class="o">(</span><span class="k">$(</span>echo-args<span class="k">))</span><span class="o">))</span>
+
+<span class="c"># $(debug-level)
+</span><span class="c"></span><span class="nv">debug-leave</span>	<span class="o">=</span>	<span class="k">$(if</span> <span class="k">$(</span>ddebug_trace<span class="k">)</span>,<span class="k">$(</span>warning Leaving <span class="nv">$0</span><span class="k">))</span>
+
+<span class="nv">comma</span>	<span class="o">:=</span> ,
+<span class="nv">echo-args</span>	<span class="o">=</span>	<span class="k">$(</span>subst <span class="s1">&#39; &#39;</span>,<span class="s1">&#39;$(comma) &#39;</span>, <span class="se">\
+</span><span class="se"></span>				<span class="k">$(</span>foreach a,1 <span class="m">2</span> <span class="m">3</span> <span class="m">4</span> <span class="m">5</span> <span class="m">6</span> <span class="m">7</span> <span class="m">8</span> 9,<span class="s1">&#39;$($a)&#39;</span><span class="k">)</span><span class="o">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果想查看函数a和b是如何被调用的，可以这么做：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">debug_trace</span>	<span class="o">=</span>	<span class="m">1</span>
+<span class="err">define</span> <span class="err">a</span>
+	<span class="k">$(</span><span class="nv">debug</span>-<span class="nv">enter</span><span class="k">)</span>
+	<span class="err">$echo</span> <span class="err">$1</span> <span class="err">$2</span> <span class="err">$3</span>
+	<span class="k">$(</span><span class="nv">debug</span>-<span class="nv">leave</span><span class="k">)</span>
+<span class="err">endef</span>
+
+<span class="err">define</span> <span class="err">b</span>
+	<span class="k">$(</span><span class="nv">debug</span>-<span class="nv">enter</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">call</span> <span class="nv">a</span>,<span class="k">$</span>1,<span class="k">$</span>2,<span class="nv">hi</span><span class="k">)</span>
+	<span class="k">$(</span><span class="nv">debug</span>-<span class="nv">leave</span><span class="k">)</span>
+<span class="err">enfef</span>
+
+<span class="nf">trace-macro</span><span class="o">:</span>
+	<span class="k">$(</span>call b,5,<span class="k">$(</span>MAKE<span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="eval与value函数">eval与value函数</h3>
+<p>eval是个与所有内置函数都不同的函数，用途在于将文本直接放在make解析器。例如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">$(eval source </span><span class="o">:</span>= <span class="n">foo</span>.<span class="n">c</span> <span class="n">bar</span>.<span class="n">c</span>)
+</code></pre></td></tr></table>
+</div>
+</div><p>首先make会扫描eval参数中是否有变量以便进行扩展的动作，然后make会解析文本以及进行求值的动作，就好像是来自输入文件一样。</p>
+<p>假设有一个用来编译许多程序的makefile，而且想要为每个程序定义若干变量，例如source，headers，objects。此时，不必反复的用手动的方式为每个程序定义这些变量。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(call program-variables, variable-prefix, file-list)
+</span><span class="c"></span><span class="err">define</span> <span class="err">program-variables</span>
+	<span class="nv">$1_sources</span> <span class="o">=</span> <span class="k">$(</span>filter %.c,<span class="nv">$2</span><span class="k">)</span>
+	<span class="nv">$2</span>_sources <span class="o">=</span> <span class="k">$(</span>filter %.h,<span class="nv">$2</span><span class="k">)</span>
+	<span class="nv">$1</span>_projects <span class="o">=</span> <span class="k">$(</span>subst .c,.o,<span class="k">$(</span>filter %.c,<span class="nv">$2</span><span class="k">))</span>
+<span class="err">endef</span>
+
+<span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>, <span class="nv">ls</span>, <span class="nv">ls</span>.<span class="nv">c</span> <span class="nv">ls</span>.<span class="nv">h</span> <span class="nv">glob</span>.<span class="nv">c</span> <span class="nv">glob</span>.<span class="nv">h</span><span class="k">)</span>
+
+<span class="nf">show-variables</span><span class="o">:</span>
+	<span class="c1"># $(ls_sources)</span>
+	<span class="c1"># $(ls_headers)</span>
+	<span class="c1"># $(ls_objects)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>program-variables宏有两个自变量，一个是三个变量的前缀；另一个是一份文件列表，宏可以从中选出文件以便设定这三个变量。但是，当我们使用这个宏的时候，会报错。</p>
+<p>这个make解析器的运作方式，一个宏被扩展为多行文本是不合法的，这会导致语法错误。此时，解析器会以为call这一行是一个规则或者是命令行的一部分，但是找不到分隔符几号。这是一个令人相当困惑的错误信息，eval函数可用来解决这个问题。如果对call做出如下修改。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>, <span class="nv">ls</span>, <span class="nv">ls</span>, <span class="nv">ls</span>.<span class="nv">c</span> <span class="nv">ls</span>.<span class="nv">h</span> <span class="nv">glob</span>.<span class="nv">c</span> <span class="nv">glob</span>.<span class="nv">h</span><span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​	现在，可以非常简单的使用这个宏来定义三个变量。注意宏当中赋值表达式的变量名称，它是由一个可以变得前缀和一个固定的后缀所构成，例如$1_sources。准确的说，这些变量并非前文提到的“经求值的变量”，不过他们非常相似。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(call program-variables, variable-prefix, file-list)
+</span><span class="c"></span><span class="err">define</span> <span class="err">program-variables</span>
+	<span class="nv">$1_sources</span> <span class="o">=</span> <span class="k">$(</span>filter %.c,<span class="nv">$2</span><span class="k">)</span>
+	<span class="nv">$2</span>_sources <span class="o">=</span> <span class="k">$(</span>filter %.h,<span class="nv">$2</span><span class="k">)</span>
+	<span class="nv">$1</span>_projects <span class="o">=</span> <span class="k">$(</span>subst .c,.o,<span class="k">$(</span>filter %.c,<span class="nv">$2</span><span class="k">))</span>
+	
+	<span class="k">$(</span><span class="nv">$1</span>_objects<span class="k">)</span>: <span class="k">$(</span><span class="nv">$1</span>_headers<span class="k">)</span>
+<span class="err">endef</span>
+
+<span class="nf">ls</span><span class="o">:</span>	<span class="k">$(</span><span class="nv">ls_objects</span><span class="k">)</span>
+
+<span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">vari</span><span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>program-variables的两个版本，可以让我们看到函数参数中的空格所造成的困惑。在前一版本中，函数所使用的两个参数并不受签到空格的影响。也就是说，不管$1或$ 2是否有<code>前导空格</code>，行为都一样。然后新的版本使用了“经求值的变量”$($1_objects)和$($1_headers)。现在为函数的第一个参数ls前面加上一个前导的空格，好让“经过求值的变量”能够以一个前导空格开头，这样会被扩展为空无一物，因为没有一个变量被定义成为以前导空格开头的。这是一个相当难以诊断的问题。</p>
+<p>我们要解决的最后一个问题的方法是延后“经求值的变量”的求值动作。处理这个问题的另一个方法就是以eval函数封装每个变量的赋值表达式，迫使其提早进行求值的动作。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(call program-variables,variable-prefix,file-list)
+</span><span class="c"></span><span class="err">define</span> <span class="err">program-variables</span>
+	<span class="k">$(</span><span class="nv">eval</span> <span class="k">$</span>1<span class="nv">_sources</span> = <span class="k">$(</span><span class="nv">filter</span> %.<span class="nv">c</span>,<span class="k">$</span>2<span class="k">))</span>
+	<span class="k">$(</span><span class="nv">eval</span> <span class="k">$</span>1<span class="nv">_headers</span> = <span class="k">$(</span><span class="nv">filter</span> %.<span class="nv">h</span>,<span class="k">$</span>2<span class="k">))</span>
+	<span class="k">$(</span><span class="nv">eval</span> <span class="k">$</span>1<span class="nv">_objects</span> = <span class="k">$(</span><span class="nv">subst</span> .<span class="nv">c</span>,.<span class="nv">o</span>,<span class="k">$(</span><span class="nv">filter</span> %.<span class="nv">c</span>,<span class="k">$</span>2<span class="k">)))</span>
+	<span class="nf">$($1_objects) </span><span class="o">:</span> <span class="k">$($</span>1<span class="nv">_headers</span><span class="k">)</span>
+<span class="err">endef</span>
+<span class="nf">ls</span><span class="o">:</span> <span class="k">$(</span><span class="nv">ls_objects</span><span class="k">)</span>
+<span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>,<span class="nv">ls</span>,<span class="nv">ls</span>.<span class="nv">c</span> <span class="nv">ls</span>.<span class="nv">h</span> <span class="nv">glob</span>.<span class="nv">c</span> <span class="nv">glob</span>.<span class="nv">h</span><span class="k">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过把变量赋值表达式封装在自己的eval调用中，可以让make在扩展program-variables宏的时候将它们放在内置数据库中。于是它们就可以立即被使用在宏中。</p>
+<p>加强这个makfile的同时，我们觉得应该为宏加入另一个规则。任何一个我们要编译的程序都应该依存于他自己的目标文件。所以为了让我们的makefile能够参数化，我们会加入一个最顶层的all工作目标，以及使用一个变量来保存我们要编译的每个程序。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c">#$(call program-variables,variable-prefix,file-list)
+</span><span class="c"></span><span class="err">define</span> <span class="err">program-variables</span>
+	<span class="k">$(</span><span class="nv">eval</span> <span class="k">$</span>1<span class="nv">_sources</span> = <span class="k">$(</span><span class="nv">filter</span> %.<span class="nv">c</span>,<span class="k">$</span>2<span class="k">))</span>
+	<span class="k">$(</span><span class="nv">eval</span> <span class="k">$</span>1<span class="nv">_headers</span> = <span class="k">$(</span><span class="nv">filter</span> %.<span class="nv">h</span>,<span class="k">$</span>2<span class="k">))</span>
+	<span class="k">$(</span><span class="nv">eval</span> <span class="k">$</span>1<span class="nv">_objects</span> = <span class="k">$(</span><span class="nv">subst</span> .<span class="nv">c</span>,.<span class="nv">o</span>,<span class="k">$(</span><span class="nv">filter</span> %.<span class="nv">c</span>,<span class="k">$</span>2<span class="k">)))</span>
+	
+	<span class="nv">program</span> <span class="o">+=</span> <span class="nv">$1</span>
+	
+	<span class="nv">$1</span>: <span class="k">$(</span><span class="nv">$1</span>_objects<span class="k">)</span>
+	
+	<span class="k">$(</span><span class="nv">$1</span>_objects<span class="k">)</span>: <span class="k">$(</span><span class="nv">$1</span>_headers<span class="k">)</span>
+<span class="err">endef</span>
+
+<span class="c"># 将all工作目标放在此处，所以它就是默认目标
+</span><span class="c"></span><span class="nf">all</span><span class="o">:</span>
+
+<span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>,<span class="nv">ls</span>,<span class="nv">ls</span>,<span class="nv">c</span> <span class="nv">ls</span>.<span class="nv">h</span> <span class="nv">glob</span>.<span class="nv">c</span> <span class="nv">glob</span>.<span class="nv">h</span><span class="k">))</span>
+<span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>,<span class="nv">cp</span>,...<span class="k">))</span>
+<span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>,<span class="nv">mv</span>,...<span class="k">))</span>
+<span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>,<span class="nv">ln</span>,...<span class="k">))</span>
+<span class="k">$(</span><span class="nv">eval</span> <span class="k">$(</span><span class="nv">call</span> <span class="nv">program</span>-<span class="nv">variables</span>,<span class="nv">rm</span>,...<span class="k">))</span>
+
+<span class="c"># 将program必要条件放在此处，所以all工作目标被定义在这里
+</span><span class="c"></span><span class="nf">all</span><span class="o">:</span> <span class="k">$(</span><span class="nv">programs</span><span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>注意all工作目标与其必要条件的摆放位置。programs变量必须等到那五个eval调用被扩展之后才会被有正确的定义，但是我们想让all工作目标成为默认目标。此时，我们可以先为makefile加入all工作目标，稍后再加入他的必要条件。</p>
+<p>program-variables函数所发生的的问题，起因于有些变量的求值动作太早进行。实际上，make所提供的value函数可以协助我们解决此问题。value函数UI返回他的variable参数未扩展的值。这个未扩展的值可以传给eval函数做进一步的处理。通过函数未扩展的值，我们可以避免必须为宏中的变量引用加上引号的为题。</p>
+<p>可惜program-variables宏无法使用此函数。因此value是一个“非全有即全无”（all-of-nothing）的函数，如果加以证明，value将不会扩展宏中的任何变量。此外，value不接受任何参数，所以我们的程序名称以及文件名列表参数都不会背扩展。</p>
+<h3 id="函数倒挂">函数倒挂</h3>
+<p>用户自定义的函数只是一个用来存放文本的变量。如果变量名称中存在$1,$2等引用，call函数会予以扩展。如果函数中不存在任何的变量引用，call并不在意。事实上，如果变量中不存在任何文本，call也不会在意。所以你看不到的任何错误或者警告信息。</p>
+<p>要想让函数具有很高的重用性，可以对它加入hook，hook是一种函数引用，用户可以重新定义，以便进行自己所定义的工作。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># $(call build-library, object-files)
+</span><span class="c"></span><span class="err">define</span> <span class="err">build-library</span>
+	<span class="k">$(</span><span class="nv">AR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">ARFLAGS</span><span class="k">)</span> <span class="k">$@</span> <span class="err">$1</span>
+	<span class="k">$(</span><span class="nv">call</span> <span class="nv">build</span>-<span class="nv">library</span>-<span class="nv">hook</span>,<span class="k">$</span>@<span class="k">)</span>
+<span class="err">endef</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>为了使用此hook，我们会定义build-library-hook函数：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">$(foo_lib)</span><span class="o">:</span> <span class="n">build</span>-<span class="n">library</span>-<span class="n">hoook</span> = <span class="k">$(</span><span class="nv">RANLIB</span><span class="k">)</span> $1
+<span class="nf">$(foo_lib)</span><span class="o">:</span> <span class="k">$(</span><span class="nv">foo_objects</span><span class="k">)</span>
+	<span class="k">$(</span>call build-library,$^<span class="k">)</span>
+	
+<span class="nf">$(bar_lib)</span><span class="o">:</span> <span class="n">build</span>-<span class="n">library</span>-<span class="n">hook</span> = <span class="k">$(</span><span class="nv">CHMOD</span><span class="k">)</span> 444 $1
+<span class="nf">$(bar_lib)</span><span class="o">:</span> <span class="k">$(</span><span class="nv">bar_objects</span><span class="k">)</span>
+	<span class="k">$(</span>call build-library,$^<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="传递参数">传递参数</h3>
+<p>一个函数可以从四种来源取得他的数据：使用call传入的参数，全局变量，自动变量以及工作目标专属变量。其中，已通过参数为最模块化的选择，因为函数的使用可以函数中的变动与全局数据无关，但是有时候这并不是最重要的评断标准。</p>
+<p>假设有若干项目共享一组make函数。将会通过变量前缀，例如PROJECT1_，来区分每个项目，而且项目里的重要便利都会使用具有“跨项目后缀”的前缀。之前范例中所用到的PROJECT_SEC等变量，将会变成PROJECT1_SRC、PROJECT1_BIN、和PROJECT_BIN。这样我么就不必编写用来读取这三个变量的函数，我们可以使用经求值的变量以及传递单一参数：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># (call process-xsl,project-prefix,file-name)
+</span><span class="c"></span><span class="err">define</span> <span class="err">process-xml</span>
+	<span class="k">$($</span>1<span class="nv">_LIB</span><span class="k">)</span><span class="err">/xmlto</span> <span class="err">-o</span> <span class="k">$($</span>1<span class="nv">_BIN</span><span class="k">)</span><span class="err">/xml/$2</span> <span class="k">$($</span>1<span class="nv">_SRC</span><span class="k">)</span><span class="err">/xml/$2</span>
+<span class="err">endef</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>传递参数的另一个方式就是使用工作目标专属变量。当大部分的调用所使用的都是标准的值，仅有少数需要特别处理的时候，这个方式特别有用。当规则被定义在一个引入文件中，但是我们想从定义变量的makefile来调用该规则时，工作目标专属变量还可以为我们提供相当的灵活性。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nf">release </span><span class="o">:</span> <span class="n">MAKING_RELEASE</span> = 1
+<span class="nf">release </span><span class="o">:</span> <span class="n">libraries</span> <span class="n">executables</span>
+<span class="err">...</span>
+<span class="nf">$(foo_lib)</span><span class="o">:</span>
+	<span class="k">$(</span>call build-library,$^<span class="k">)</span>
+<span class="err">...</span>
+<span class="c"># $(call build-library, file-list)
+</span><span class="c"></span><span class="err">define</span> <span class="err">build-library</span>
+	<span class="k">$(</span><span class="nv">AR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">ARFLAGS</span><span class="k">)</span> <span class="k">$@</span>				<span class="err">\</span>
+		<span class="k">$(</span><span class="nv">if</span> <span class="k">$(</span><span class="nv">MAKING_RELEASE</span><span class="k">)</span>, 		\
+			<span class="k">$(</span><span class="nv">filter</span>-<span class="nv">out</span> <span class="nv">debug</span>/%,<span class="k">$</span>1<span class="k">)</span>,	\
+				<span class="k">$</span>1<span class="k">)</span>
+<span class="err">endef</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="14命令">1.4命令</h2>
 <h1 id="第二章高级与特别的用法">第二章	高级与特别的用法</h1>
 <h2 id="21大型项目的管理">2.1大型项目的管理</h2>
 <h2 id="22-可以移植性的makefile">2.2 可以移植性的makefile</h2>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">
+</code></pre></td></tr></table>
+</div>
+</div>
     </div>
 
     <div class="post-copyright">
