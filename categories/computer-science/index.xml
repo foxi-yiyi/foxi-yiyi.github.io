@@ -6,10 +6,15 @@
     <description>Recent content in Computer Science on Moeah&#39;s BLOG</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0800</lastBuildDate>
-    
-	<atom:link href="https://foxi-yiyi.github.io/categories/computer-science/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 27 Sep 2020 00:00:00 +0800</lastBuildDate><atom:link href="https://foxi-yiyi.github.io/categories/computer-science/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PostgreSQL中的对齐宏——TYPEALIGN</title>
+      <link>https://foxi-yiyi.github.io/post/postgresql%E4%B8%AD%E7%9A%84%E5%AF%B9%E9%BD%90%E5%AE%8Ftypealign/</link>
+      <pubDate>Sun, 27 Sep 2020 00:00:00 +0800</pubDate>
+      
+      <guid>https://foxi-yiyi.github.io/post/postgresql%E4%B8%AD%E7%9A%84%E5%AF%B9%E9%BD%90%E5%AE%8Ftypealign/</guid>
+      <description>PostgreSQL的对齐宏——TYPEALIGN 分析 在理解TYPEALIGN之前现理解一下这个词语的意义，TYPEALIGN乍一看就是一个</description>
+    </item>
     
     <item>
       <title>GNU Make 项目管理</title>

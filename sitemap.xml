@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://foxi-yiyi.github.io/post/postgresql%E4%B8%AD%E7%9A%84%E5%AF%B9%E9%BD%90%E5%AE%8Ftypealign/</loc>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://foxi-yiyi.github.io/post/gnu.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/</loc>
     <lastmod>2020-08-28T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -45,41 +52,55 @@
   
   <url>
     <loc>https://foxi-yiyi.github.io/categories/</loc>
-    <lastmod>2020-08-28T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/categories/computer-science/</loc>
-    <lastmod>2020-08-28T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://foxi-yiyi.github.io/tags/gnu-makefile/</loc>
-    <lastmod>2020-08-28T00:00:00+08:00</lastmod>
+    <loc>https://foxi-yiyi.github.io/tags/database/</loc>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/</loc>
-    <lastmod>2020-08-28T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/tags/postgresql/</loc>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/post/</loc>
-    <lastmod>2020-08-28T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/tags/</loc>
+    <lastmod>2020-09-27T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/tags/gnu-makefile/</loc>
     <lastmod>2020-08-28T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
