@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>PostgreSQL内存池结构解析 - Moeah&#39;s BLOG</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="foxi-yiyi" /><meta name="description" content="PostgreSQL内存池结构解析 1.内存上下文 ​ postgresql在7版本引入了内存上下文机制，目的是解决日益严重的内存泄漏问题。在引入" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.75.1 with theme even" />
+
+
+<link rel="canonical" href="https://foxi-yiyi.github.io/post/postgresql%E5%86%85%E5%AD%98%E6%B1%A0%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="PostgreSQL内存池结构解析" />
+<meta property="og:description" content="PostgreSQL内存池结构解析 1.内存上下文 ​ postgresql在7版本引入了内存上下文机制，目的是解决日益严重的内存泄漏问题。在引入" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://foxi-yiyi.github.io/post/postgresql%E5%86%85%E5%AD%98%E6%B1%A0%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/" />
+<meta property="article:published_time" content="2020-09-28T00:00:00+08:00" />
+<meta property="article:modified_time" content="2020-09-28T00:00:00+08:00" />
+<meta itemprop="name" content="PostgreSQL内存池结构解析">
+<meta itemprop="description" content="PostgreSQL内存池结构解析 1.内存上下文 ​ postgresql在7版本引入了内存上下文机制，目的是解决日益严重的内存泄漏问题。在引入">
+<meta itemprop="datePublished" content="2020-09-28T00:00:00+08:00" />
+<meta itemprop="dateModified" content="2020-09-28T00:00:00+08:00" />
+<meta itemprop="wordCount" content="2972">
+
+
+
+<meta itemprop="keywords" content="PostgreSQL,Database," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="PostgreSQL内存池结构解析"/>
+<meta name="twitter:description" content="PostgreSQL内存池结构解析 1.内存上下文 ​ postgresql在7版本引入了内存上下文机制，目的是解决日益严重的内存泄漏问题。在引入"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Moeah&#39;s BLOG</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Moeah&#39;s BLOG</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">PostgreSQL内存池结构解析</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-09-28 </span>
+        <div class="post-category">
+            <a href="/categories/computer-science/"> Computer Science </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#postgresql内存池结构解析">PostgreSQL内存池结构解析</a>
+      <ul>
+        <li><a href="#1内存上下文">1.内存上下文</a>
+          <ul>
+            <li><a href="#11-内存块和内存片">1.1 内存块和内存片</a></li>
+            <li><a href="#12-memorycontextdata结构体">1.2 MemoryContextData结构体</a></li>
+            <li><a href="#13-allocsetcontext结构体">1.3 AllocSetContext结构体</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="postgresql内存池结构解析">PostgreSQL内存池结构解析</h1>
+<h2 id="1内存上下文">1.内存上下文</h2>
+<p>​	postgresql在7版本引入了内存上下文机制，目的是解决日益严重的内存泄漏问题。在引入了内存上下文以后，所有的内存分配改为在内存上下文中进行。对于用户来说，对内存的申请有原来的malloc、tree变味了palloc、pfree。对内存上下文的常用操作包括：</p>
+<blockquote>
+<ul>
+<li>创建一个内存上下文：		    MemoryContextCreate</li>
+<li>在内存上下文中分配内存片：  palloc</li>
+<li>删除内存上下文：                      MemoryContextDelete</li>
+<li>重置内存上下文：                      MemoryContextReset</li>
+</ul>
+</blockquote>
+<h3 id="11-内存块和内存片">1.1 内存块和内存片</h3>
+<ul>
+<li>内存块（BLOCK）：	内存上下文在内存中申请（malloc）到的内存单位。</li>
+<li>内存片（CHUNK）：   用户在内存上下文中申请（palloc）到的内存单位。</li>
+</ul>
+<p>每个管理的内存区域包括多个内存快，每个内存块又被分为多个内存片单元。通俗的理解：内存块就是比较大块的内存，内存片就是大块内存中的更小的内存单元。一般来说内存的小规模使用频率较高，所以申请内存块使用的是malloc，使用后就会立即释放给操作系统；申请小内存使用的是自己的一套机制，使用完以后并不会直接返还给操作系统，而是放入自己维护的一个内存管理链表，方便后续的使用。</p>
+<h3 id="12-memorycontextdata结构体">1.2 MemoryContextData结构体</h3>
+<p>系统中内存的分配工作都是在各种语义的内存上下文MemoryContext中进行，因此可以很轻松的通过内存上下文释放其中的所有相关内存空间，而不用费心去释放每一个空间。这样的内存分配和释放更快捷，更可靠。这种机制借鉴了操作系统中的一些概念。操作系统中进程可以在执行环境中执行而不用互相影响。</p>
+<p>postgresql中通过MemoryContextCreate创建内存上下文。下面举一个简单地微缩版本代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">MemoryContextData</span> <span class="o">*</span><span class="n">MemoryContext</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">MemoryContextData</span>
+<span class="p">{</span>
+    <span class="n">MemoryContext</span> <span class="n">parent</span><span class="p">;</span>		<span class="cm">/* NULL if toplevel context */</span>
+    <span class="n">MemoryContext</span> <span class="n">first_child</span><span class="p">;</span>	<span class="cm">/* head of linked list of children */</span>
+    <span class="n">MemoryContext</span> <span class="n">next_child</span><span class="p">;</span>	<span class="cm">/* next child of same parent */</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>					<span class="cm">/* context name */</span>
+    <span class="kt">char</span> <span class="n">isReset</span><span class="p">;</span>				<span class="cm">/* T = nospace alloced since last reset */</span>
+<span class="p">}</span> <span class="n">MemoryContextData</span><span class="p">;</span>
+
+<span class="cm">/*
+</span><span class="cm"> *	 name:	MemoryContextCreate
+</span><span class="cm"> * 	 function:	初始化内存上下文结构
+</span><span class="cm"> *	 params：	parent	父节点
+</span><span class="cm"> *				name	内存上下文名称
+</span><span class="cm"> */</span>
+<span class="n">MemoryContext</span> 
+<span class="nf">MemoryContextCreate</span><span class="p">(</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">name</span><span class="p">,</span> <span class="n">MemoryContext</span> <span class="n">parent</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">MemoryContext</span> <span class="n">node</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">MemoryContextData</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">needSize</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    
+    <span class="n">node</span> <span class="o">=</span> <span class="p">(</span><span class="n">MemoryContext</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="n">needSize</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;error</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="n">memset</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">size</span><span class="p">);</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">parent</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">first_child</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">next_child</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">isReset</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">node</span> <span class="o">+</span> <span class="n">size</span><span class="p">;</span>
+    <span class="n">strcpy</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="n">name</span><span class="p">);</span>
+    
+    <span class="k">if</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">next_child</span> <span class="o">=</span> <span class="n">parent</span><span class="o">-&gt;</span><span class="n">first_child</span><span class="p">;</span>
+        <span class="n">parent</span><span class="o">-&gt;</span><span class="n">first_child</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">node</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">MemoryContext</span> <span class="n">TopMemoryContext</span><span class="p">,</span> <span class="n">CacheMemoryContext</span><span class="p">;</span>
+    <span class="n">TopMemoryContext</span> <span class="o">=</span> <span class="p">(</span><span class="n">MemoryContext</span><span class="p">)</span> <span class="n">MemoryContextCreate</span><span class="p">(</span><span class="s">&#34;TopMemoryContext&#34;</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">CacheMemoryContext</span> <span class="o">=</span> <span class="p">(</span><span class="n">MemoryContext</span><span class="p">)</span> <span class="n">MemoryContextCreate</span><span class="p">(</span><span class="s">&#34;MemoryContextCreate&#34;</span><span class="p">,</span><span class="n">TopMemoryContext</span><span class="p">);</span>
+    
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;name:: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span><span class="n">CacheMemoryContext</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;name:: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span><span class="n">CacheMemoryContext</span><span class="o">-&gt;</span><span class="n">parent</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述小规模代码的结构体如下图所示：</p>
+<p><img src="/MemoryPool-01.png" alt="Local Picture" title="Local Picture"></p>
+<p>按照上述小规模代码，内存上下文结构通过MemoryContextData实现最基本的内存管理机制。</p>
+<p>MemoryContextData的结构如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">MemoryContextData</span>
+<span class="p">{</span>
+    <span class="n">NodeTag</span>     <span class="n">type</span><span class="p">;</span>           <span class="cm">/* identifies exact kind of context */</span>
+    <span class="n">MemoryContextMethods</span> <span class="o">*</span><span class="n">methods</span><span class="p">;</span>      <span class="cm">/* virtual function table */</span>
+    <span class="n">MemoryContext</span> <span class="n">parent</span><span class="p">;</span>       <span class="cm">/* NULL if no parent (toplevel context) */</span>
+    <span class="n">MemoryContext</span> <span class="n">firstchild</span><span class="p">;</span>   <span class="cm">/* head of linked list of children */</span>
+    <span class="n">MemoryContext</span> <span class="n">nextchild</span><span class="p">;</span>    <span class="cm">/* next child of same parent */</span>
+    <span class="kt">char</span>       <span class="o">*</span><span class="n">name</span><span class="p">;</span>           <span class="cm">/* context name (just for debugging) */</span>
+    <span class="kt">bool</span>        <span class="n">isReset</span><span class="p">;</span>        <span class="cm">/* T = no space alloced since last reset */</span>
+<span class="p">}</span> <span class="n">MemoryContextData</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>且MemoryContextData之间形成一种树形结构，如下图所示：</p>
+<p><img src="/MemoryPool-02.png" alt="Local Picture" title="Local Picture"></p>
+<p>每个内存上下文节点中都有三个指针，分别指向其父上下文，胞弟上下文，长子上下文。</p>
+<ul>
+<li><strong>*method</strong>：用来记录该上下文中进行内存操作的接口和回调函数。</li>
+<li><strong>iseset</strong>：是否重置内存上下文。所谓重置内存上下文是指释放内存上下文中所分配的内存给操作系统。在一个内存上下文被创建时，其isReset字段置为True，表示从上一次重置到目前没有内存被分配。只要在该内存上下文中进行了分配，就需要将isReset字段置为False。有了该变量的标识，在进行重置时，我们可以检查该字段的值，如果内存上下文没有进行过内存分配，则不需要进行实际的重置工作，从而提高效率。</li>
+<li><strong>name</strong>：用来标记该上下文的名称。</li>
+<li><strong>type</strong>：用来标记上下文的类型。</li>
+</ul>
+<p>总体来说，MemoryContextData结构体现的是不同上下文之间的关系。</p>
+<h3 id="13-allocsetcontext结构体">1.3 AllocSetContext结构体</h3>
+<p>MemoryContextData并没有体现内存之间的具体管理方式，现在不妨将MemoryContextData扩大一层，以便于进一步分析：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">AllocSetContext</span>
+<span class="p">{</span>
+    <span class="n">MemoryContextData</span> <span class="n">header</span><span class="p">;</span>   <span class="cm">/* Standard memory-context fields */</span>
+    <span class="cm">/* Info about storage allocated in this context: */</span>
+    <span class="n">AllocBlock</span>  <span class="n">blocks</span><span class="p">;</span>         <span class="cm">/* head of list of blocks in this set */</span>
+    <span class="n">AllocChunk</span>  <span class="n">freelist</span><span class="p">[</span><span class="n">ALLOCSET_NUM_FREELISTS</span><span class="p">];</span>       <span class="cm">/* free chunk lists */</span>
+    <span class="cm">/* Allocation parameters for this context: */</span>
+    <span class="n">Size</span>        <span class="n">initBlockSize</span><span class="p">;</span>  <span class="cm">/* initial block size */</span>
+    <span class="n">Size</span>        <span class="n">maxBlockSize</span><span class="p">;</span>   <span class="cm">/* maximum block size */</span>
+    <span class="n">Size</span>        <span class="n">nextBlockSize</span><span class="p">;</span>  <span class="cm">/* next block size to allocate */</span>
+    <span class="n">Size</span>        <span class="n">allocChunkLimit</span><span class="p">;</span>    <span class="cm">/* effective chunk size limit */</span>
+    <span class="n">AllocBlock</span>  <span class="n">keeper</span><span class="p">;</span>         <span class="cm">/* if not NULL, keep this block over resets */</span>
+<span class="p">}</span> <span class="n">AllocSetContext</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上图中已经由MemoryContextData明确了内存上下文之间的关系，AllocSetContext在MemoryContextData的基础上，添加了部分结构。其中header成员就标记了所属的内存上下文组成的树形结构。</p>
+<ul>
+<li><strong>header</strong>：头部信息是一个MemoryContextData结构，header是一个进入上下文的外部接口，事实上管理内存上下文就是通过这个header完成的。</li>
+<li><strong>blocks</strong>：内存块链表。该字段是一个指向内存块结构体的指针，表示一个内存块。不同的内存块成员之间通过next指针连接成一个单向链表，blocks指向的就是这个链表的头部。那个内存块中进行分配时产生的内存片段被称为内存片，每个内存片包括一个头部信息和数据区域。其中头部包含了最最必要的该分片所属的内存上下文以及内存区的其他信息。内存片的数据区则被紧密安排在头部信息以后。并通过palloc和pfree自由取用。</li>
+</ul>
+<ul>
+<li><strong>initBlockSize、maxBlockSize、nextBlockSize</strong>：initBlockSize和maxBlockSize字段在内存上下文创建时指定，且在创建是nextBlockSize会置为和initBlockSize相同的值。nextBlockSize表示下一次分配的内存块的大小，在进行内存分配时，如果需要分配一个新的内存块，则这个新的内存块的大小将采用nextBlockSize的值。在有些情况下，需要将下一次要分配的内存块的大小置为上一次的2倍，这时nextBlockSize就会变大。但最大不超过maxBlockSize指定的大小。当内存上下文重置时，nextBlockSize又会恢复到初始值，也就是initBlockSize。</li>
+<li><strong>allocChunkLimit</strong>：内存块会分成多个被称为内存片的内存单元，在分配内存片时，如果一个内存片的尺寸超过了宏ALLOC_CHUNK_LIMIT时，将会为该内存片单独分配一个独立的内存块，这样做是为了避免日后进行内存回收时造成过多的碎片。由于宏ALLOC_CHUNK_LIMIT是不能运行时更改的，因此PostgreSQL提供了allocChunkLimit用于自定义一个阈值。如果定义了该字段的值，则在进行超限检查时会使用该字段来替换宏定义进行判断。</li>
+<li><strong>keeper</strong>：在内存上下文进行重置时不会对keeper中记录的内存块进行释放，而是对齐内容进行清空。这样可以保证内存上下文重置结束后就可以包含一定的可用内存空间，而不需要使用malloc另行申请。另外也可以避免在某个内存上下文被反复重置时，反复进行内存片malloc带来的风险。</li>
+<li><strong>freelist</strong>:长度为11的数组，用于维护在内存块中的空闲内存片，这些内存片主要用于再分配。该数组每一个元素指向一个由特定大小的空闲内存片组成的链表，这个大小与该元素在数组中的位置有关：free数组中最小的空闲存片为2^3^=8；最大为2^13^=8K字节。即数组中第k个元素指向链表每个空闲数据库的大小为2^k+2^字节。因此freelist维护了11个大小不同的空闲内存片链表，管理着11个不同大小的空闲内存片。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">foxi-yiyi</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-09-28
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">Moeah</span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/postgresql/">PostgreSQL</a>
+          <a href="/tags/database/">Database</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/postgresql%E4%B8%AD%E7%9A%84%E5%AF%B9%E9%BD%90%E5%AE%8Ftypealign/">
+            <span class="next-text nav-default">PostgreSQL中的对齐宏——TYPEALIGN</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="https://foxi-yiyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">foxi-yiyi</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
