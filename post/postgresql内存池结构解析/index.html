@@ -49,7 +49,7 @@
 <meta itemprop="description" content="PostgreSQL内存池结构解析 1.内存上下文 ​ postgresql在7版本引入了内存上下文机制，目的是解决日益严重的内存泄漏问题。在引入">
 <meta itemprop="datePublished" content="2020-09-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-09-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="2972">
+<meta itemprop="wordCount" content="9753">
 
 
 
@@ -141,11 +141,22 @@
   <ul>
     <li><a href="#postgresql内存池结构解析">PostgreSQL内存池结构解析</a>
       <ul>
-        <li><a href="#1内存上下文">1.内存上下文</a>
+        <li><a href="#1内存上下文">1.内存上下文</a></li>
+        <li><a href="#11内存上下文管理结构">1.1内存上下文管理结构</a>
           <ul>
-            <li><a href="#11-内存块和内存片">1.1 内存块和内存片</a></li>
-            <li><a href="#12-memorycontextdata结构体">1.2 MemoryContextData结构体</a></li>
-            <li><a href="#13-allocsetcontext结构体">1.3 AllocSetContext结构体</a></li>
+            <li><a href="#111-memorycontextdata结构体">1.1.1 MemoryContextData结构体</a></li>
+            <li><a href="#112-allocsetcontext结构体">1.1.2 AllocSetContext结构体</a></li>
+          </ul>
+        </li>
+        <li><a href="#12-内存块和内存片">1.2 内存块和内存片</a>
+          <ul>
+            <li><a href="#121-allocblockallocchunk结构体">1.2.1 AllocBlock，AllocChunk结构体</a></li>
+          </ul>
+        </li>
+        <li><a href="#13原理图">1.3原理图</a></li>
+        <li><a href="#14算法实现">1.4算法实现</a>
+          <ul>
+            <li></li>
           </ul>
         </li>
       </ul>
@@ -166,13 +177,34 @@
 <li>重置内存上下文：                      MemoryContextReset</li>
 </ul>
 </blockquote>
-<h3 id="11-内存块和内存片">1.1 内存块和内存片</h3>
+<p>PostgreSQL的动态管理内存的方式有以下优点：</p>
+<ol>
+<li>防止内存泄漏。采用传统的malloc/free来控制和管理内存经常会导致验证的内存泄漏。首先要保证每一个malloc的内存都有对应的free来释放，在工程量较大的项目中，函数调用是很深的，很难保证；其次要保证函数退出或者异常处理时每种情况下都能正确的释放内存，这对代码编写人员是个很大的挑战。PostgreSQL的内存管理通过预先分配一大段内存，然后自己来管理这段内存，最后只要在合适的时间点释放这些内存就可以，不需要考虑内部的小块内存。</li>
+<li>分配效率。由于堆内存是线程间共享的，所以传统的malloc必须要考虑分配时候的线程安全问题，从而要用锁来控制；PostgreSQL由于是多进程架构，每个进程只有一个线程。不需要考虑并发；项目可以看到，PostgreSQL内存管理没有涉及到锁，因此性能较快。</li>
+<li>减少内存碎片。根据第一点的描述，每次想OS申请一大段内存，然后自主管理，可以有效地减少碎片。</li>
+</ol>
+<p><strong>主要的全局内存上下文：</strong></p>
 <ul>
-<li>内存块（BLOCK）：	内存上下文在内存中申请（malloc）到的内存单位。</li>
-<li>内存片（CHUNK）：   用户在内存上下文中申请（palloc）到的内存单位。</li>
+<li><strong>TopMemoryContext</strong> — 位于内存上下文树型管理结构的顶层，所有其它的内存上下文都是TopMemoryContext的直接或间接子节点。在TopMemoryContext上的内存分配其实和malloc是完全一样的，因为TopMemoryContext是永远存在的，从不会被重用和删除。只有那些会话级或控制模块相关的，需要永久保留的，才能使用TopMemoryContext。</li>
+<li><strong>TopMemoryContext</strong>–这是内存环境树实际的最高层级,其他每一个内存环境都是其直接或间接的子内存环境.在这里,分配内存与使用”malloc”一样,因为这个内存环境永远也不会重设或删除.这样做是为了那些永远存在或是在删除时需要非常仔细的情况.一个例子是,fd.c中打开文件的列表,以及内存环境自身的内存环境管理节点本身.,除非真正需要,应避免在这里分配内存.另外,特别要避免在运行时CurrentMemoryContext指向这里.</li>
+<li><strong>PostmasterContext</strong>–这是postmaster正常的工作内存环境.后台进程建立之后,就可以删除PostmasterContext,从而释放postmaster不再需要的内存.(所有需要从postmaster传递到后台进程的数据都是通过TopMemoryContext内存环境来传递的.postmaster只有TopMemoryContext,PostmasterContext,以及ErrorContext–其余的最高层次的内存环境将在每个后台进程启动时创建.</li>
+<li><strong>CacheMemoryContext</strong>–relcache,catcache以及相关模块的持久存储,无法重设或删除,所以无法真正地将其和TopMemoryContext区分开来.但是需要将两者区分开来以方便调试.(注意:CacheMemoryContext会有短生命周期的子内存环境.例如,有一个作为relcache项的最好的辅助存储的子内存环境.我们可以很容易地释放规则分析树,而无需创建一个可靠版本的freeObject函数来释放规则分析树占用的内存.</li>
+<li><strong>MessageContext</strong>–此内存环境持有前台进程传递过来的当前命令消息,以及当前消息衍生出来的并且与当前消息生命周期相同的存储空间.(例如,在simple-Query模式下,分析树和计划树可以在此内存环境中).这个内存环境可以在PostgresMain的每一次循环中被重设,其子内存环境被删除.这与每一个事务和运行平台(portal)的内存环境分开,因为一个查询语句可能需要比单一一个事务或运行平台(portal)保留的时间长或短一些.</li>
+<li><strong>TopTransactionContext</strong>–此内存环境一直持续到最高层事务结束的时候.在每一次最高层事务结束的时候,这个内存环境都会被重设,其所有的子内存环境都会被删除.在大多数情况下,你无须在这里分配内存,而应该在CurTransactionContext中分配.在此内存环境中的应该是管理多个子事务状态的控制信息.注意:此内存环境不会在出错时立即清除,而是到事务块通过调用COMMIT/ROLLBACK时清除.</li>
+<li><strong>CurTransactionContext</strong>–此内存环境持有当前事务的数据直到当前事务结束,特别是在最高层事务提交时需要此内存环境.当我们处于一个最高层事务中时,此内存环境就跟TopTransactionContext一致,但是在一个子事务中,CurTransactionContext指向一个子内存环境.</li>
+<li><strong>PortalContext</strong>–这并不是一个独立的内存环境,而是一个全局变量,指向当前活动着的运行平台的per-portal内存环境.在需要分配与当前运行平台(portal)运行时长一致的存储空间时使用.</li>
+<li><strong>ErrorContext</strong>–这个持久性的内存环境会在错误恢复过程中切换过去,然后在恢复结束时重设.我们安排了8K在任何时刻都有效的内存.这样,我们可以保证了,甚至在后台进程已经用尽了其所有内存,都会有一些内存可以用来进行错误恢复.这使得内存用尽可以被当做一个通常的错误(ERROR)情况,而不是一个崩溃(FATAL)情况.</li>
 </ul>
-<p>每个管理的内存区域包括多个内存快，每个内存块又被分为多个内存片单元。通俗的理解：内存块就是比较大块的内存，内存片就是大块内存中的更小的内存单元。一般来说内存的小规模使用频率较高，所以申请内存块使用的是malloc，使用后就会立即释放给操作系统；申请小内存使用的是自己的一套机制，使用完以后并不会直接返还给操作系统，而是放入自己维护的一个内存管理链表，方便后续的使用。</p>
-<h3 id="12-memorycontextdata结构体">1.2 MemoryContextData结构体</h3>
+<h2 id="11内存上下文管理结构">1.1内存上下文管理结构</h2>
+<p>PG里内存上下文的控制结构可以视为两层结构，一个是底层的AllocSet层和上层的MemoryContext层。MemoryContext只是一个抽象类型用于对外提供统一的内存上下文操作的标准接口，只关心SQL执行阶段不同内存上下之前的继承关系，不关心内存本身的分配释放。AllocSet类似于简单的操作系统内存管理，要组织已使用内存和已空闲内存的管理。</p>
+<p>底层的AllocSet具体实现可以有多种方式，但目前只提供了AllocSetContext一种实现。通过看下面的两个结构体介绍可以看到，AllocSetContext最开始位置是一个MemoryContextData类型的属性。这有点像面向对象编程语言中类的继承，其中MemoryContextData是父类，AllocSetContext是子类，在父类的基础上增加了一些新的属性和成员函数。实际上PG里有很多地方采用这样的思想实现对接口的封装。因此所有的实现方式的内存上下文结构都必须以MemoryContext开头，以实现继承的目的。（参见MemoryContextMethods结构的注释部分）</p>
+<p>相关代码：</p>
+<ul>
+<li>src/backend/utils/mmgr/aset.c, mcxt.c, portalmem.c, README: 内存管理模块</li>
+<li>src/include/nodes/memnodes.h: 实现内存上下文管理结构封装接口的头文件</li>
+<li>src/include/utils/memutils.h: 内存上下文对外使用标准接口头文件</li>
+</ul>
+<h3 id="111-memorycontextdata结构体">1.1.1 MemoryContextData结构体</h3>
 <p>系统中内存的分配工作都是在各种语义的内存上下文MemoryContext中进行，因此可以很轻松的通过内存上下文释放其中的所有相关内存空间，而不用费心去释放每一个空间。这样的内存分配和释放更快捷，更可靠。这种机制借鉴了操作系统中的一些概念。操作系统中进程可以在执行环境中执行而不用互相影响。</p>
 <p>postgresql中通过MemoryContextCreate创建内存上下文。下面举一个简单地微缩版本代码：</p>
 <div class="highlight"><div class="chroma">
@@ -341,7 +373,7 @@
 <li><strong>type</strong>：用来标记上下文的类型。</li>
 </ul>
 <p>总体来说，MemoryContextData结构体现的是不同上下文之间的关系。</p>
-<h3 id="13-allocsetcontext结构体">1.3 AllocSetContext结构体</h3>
+<h3 id="112-allocsetcontext结构体">1.1.2 AllocSetContext结构体</h3>
 <p>MemoryContextData并没有体现内存之间的具体管理方式，现在不妨将MemoryContextData扩大一层，以便于进一步分析：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -381,11 +413,545 @@
 <li><strong>blocks</strong>：内存块链表。该字段是一个指向内存块结构体的指针，表示一个内存块。不同的内存块成员之间通过next指针连接成一个单向链表，blocks指向的就是这个链表的头部。那个内存块中进行分配时产生的内存片段被称为内存片，每个内存片包括一个头部信息和数据区域。其中头部包含了最最必要的该分片所属的内存上下文以及内存区的其他信息。内存片的数据区则被紧密安排在头部信息以后。并通过palloc和pfree自由取用。</li>
 </ul>
 <ul>
-<li><strong>initBlockSize、maxBlockSize、nextBlockSize</strong>：initBlockSize和maxBlockSize字段在内存上下文创建时指定，且在创建是nextBlockSize会置为和initBlockSize相同的值。nextBlockSize表示下一次分配的内存块的大小，在进行内存分配时，如果需要分配一个新的内存块，则这个新的内存块的大小将采用nextBlockSize的值。在有些情况下，需要将下一次要分配的内存块的大小置为上一次的2倍，这时nextBlockSize就会变大。但最大不超过maxBlockSize指定的大小。当内存上下文重置时，nextBlockSize又会恢复到初始值，也就是initBlockSize。</li>
-<li><strong>allocChunkLimit</strong>：内存块会分成多个被称为内存片的内存单元，在分配内存片时，如果一个内存片的尺寸超过了宏ALLOC_CHUNK_LIMIT时，将会为该内存片单独分配一个独立的内存块，这样做是为了避免日后进行内存回收时造成过多的碎片。由于宏ALLOC_CHUNK_LIMIT是不能运行时更改的，因此PostgreSQL提供了allocChunkLimit用于自定义一个阈值。如果定义了该字段的值，则在进行超限检查时会使用该字段来替换宏定义进行判断。</li>
-<li><strong>keeper</strong>：在内存上下文进行重置时不会对keeper中记录的内存块进行释放，而是对齐内容进行清空。这样可以保证内存上下文重置结束后就可以包含一定的可用内存空间，而不需要使用malloc另行申请。另外也可以避免在某个内存上下文被反复重置时，反复进行内存片malloc带来的风险。</li>
-<li><strong>freelist</strong>:长度为11的数组，用于维护在内存块中的空闲内存片，这些内存片主要用于再分配。该数组每一个元素指向一个由特定大小的空闲内存片组成的链表，这个大小与该元素在数组中的位置有关：free数组中最小的空闲存片为2^3^=8；最大为2^13^=8K字节。即数组中第k个元素指向链表每个空闲数据库的大小为2^k+2^字节。因此freelist维护了11个大小不同的空闲内存片链表，管理着11个不同大小的空闲内存片。</li>
+<li>
+<p><strong>initBlockSize、maxBlockSize、nextBlockSize</strong>：initBlockSize和maxBlockSize字段在内存上下文创建时指定，且在创建是nextBlockSize会置为和initBlockSize相同的值。nextBlockSize表示下一次分配的内存块的大小，在进行内存分配时，如果需要分配一个新的内存块，则这个新的内存块的大小将采用nextBlockSize的值。在有些情况下，需要将下一次要分配的内存块的大小置为上一次的2倍，这时nextBlockSize就会变大。但最大不超过maxBlockSize指定的大小。当内存上下文重置时，nextBlockSize又会恢复到初始值，也就是initBlockSize。</p>
+</li>
+<li>
+<p><strong>allocChunkLimit</strong>：内存块会分成多个被称为内存片的内存单元，在分配内存片时，如果一个内存片的尺寸超过了宏ALLOC_CHUNK_LIMIT时，将会为该内存片单独分配一个独立的内存块，这样做是为了避免日后进行内存回收时造成过多的碎片。由于宏ALLOC_CHUNK_LIMIT是不能运行时更改的，因此PostgreSQL提供了allocChunkLimit用于自定义一个阈值。如果定义了该字段的值，则在进行超限检查时会使用该字段来替换宏定义进行判断。</p>
+</li>
+<li>
+<p><strong>keeper</strong>：在内存上下文进行重置时不会对keeper中记录的内存块进行释放，而是对齐内容进行清空。这样可以保证内存上下文重置结束后就可以包含一定的可用内存空间，而不需要使用malloc另行申请。另外也可以避免在某个内存上下文被反复重置时，反复进行内存片malloc带来的风险。</p>
+</li>
+<li>
+<p><strong>freelist</strong>:长度为11的数组，用于维护在内存块中的空闲内存片，这些内存片主要用于再分配。该数组每一个元素指向一个由特定大小的空闲内存片组成的链表，这个大小与该元素在数组中的位置有关：free数组中最小的空闲存片为2^3^=8；最大为2^13^=8K字节。即数组中第k个元素指向链表每个空闲数据库的大小为2^k+2^字节。因此freelist维护了11个大小不同的空闲内存片链表，管理着11个不同大小的空闲内存片。</p>
+<ul>
+<li>aset：有两个作用，如果成员正在使用当中，aset字段可以指向所属的AllocSet。如果内存片为空闲，也就是说处于一个空闲链表中，那么他的aset字段就指向空闲链表中它之后的内存片。这样一来从freelist数组元素指向链表的头开始，顺着aset字段指向下一个内存片就可以找到该空闲连标红所有的空闲的内存片。</li>
 </ul>
+<p>可以发现freelist内存片的大小都是2的倍数（TO DO），申请特定大小内存将取正好够用的那个内存片。如果申请的内存超过了allocChunkLimit字段的值。则直接分配一个内存块，这个内存卡只存放一个内存片。这种情况下在这个内存片释放的时候，会将整个内存块释放，而不是将内存片加到freelist中。</p>
+</li>
+</ul>
+<h2 id="12-内存块和内存片">1.2 内存块和内存片</h2>
+<ul>
+<li>内存块（BLOCK）：	内存上下文在内存中申请（malloc）到的内存单位。</li>
+<li>内存片（CHUNK）：   用户在内存上下文中申请（palloc）到的内存单位。</li>
+</ul>
+<p>每个管理的内存区域包括多个内存快，每个内存块又被分为多个内存片单元。通俗的理解：内存块就是比较大块的内存，内存片就是大块内存中的更小的内存单元。一般来说内存的小规模使用频率较高，所以申请内存块使用的是malloc，使用后就会立即释放给操作系统；申请小内存使用的是自己的一套机制，使用完以后并不会直接返还给操作系统，而是放入自己维护的一个内存管理链表，方便后续的使用。</p>
+<h3 id="121-allocblockallocchunk结构体">1.2.1 AllocBlock，AllocChunk结构体</h3>
+<h4 id="allocblock">AllocBlock</h4>
+<p>内存片和内存块都是管理内存的基本单位，数据结构如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/*
+</span><span class="cm"> * AllocBlock
+</span><span class="cm"> *		An AllocBlock is the unit of memory that is obtained by aset.c
+</span><span class="cm"> *		from malloc().	It contains one or more AllocChunks, which are
+</span><span class="cm"> *		the units requested by palloc() and freed by pfree().  AllocChunks
+</span><span class="cm"> *		cannot be returned to malloc() individually, instead they are put
+</span><span class="cm"> *		on freelists by pfree() and re-used by the next palloc() that has
+</span><span class="cm"> *		a matching request size.
+</span><span class="cm"> *
+</span><span class="cm"> *		AllocBlockData is the header data for a block --- the usable space
+</span><span class="cm"> *		within the block begins at the next alignment boundary.
+</span><span class="cm"> */</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">AllocBlockData</span>
+<span class="p">{</span>
+	<span class="n">AllocSet</span>	<span class="n">aset</span><span class="p">;</span>			<span class="cm">/* aset that owns this block */</span>
+	<span class="n">AllocBlock</span>	<span class="n">next</span><span class="p">;</span>			<span class="cm">/* next block in aset&#39;s blocks list */</span>
+	<span class="kt">char</span>	   <span class="o">*</span><span class="n">freeptr</span><span class="p">;</span>		<span class="cm">/* start of free space in this block */</span>
+	<span class="kt">char</span>	   <span class="o">*</span><span class="n">endptr</span><span class="p">;</span>			<span class="cm">/* end of space in this block */</span>
+<span class="p">}</span>	<span class="n">AllocBlockData</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="n">AllocBlockData</span> <span class="o">*</span> <span class="n">AllocBlock</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>aset:</strong> 指向拥有这个block的AllocSetContext结构</li>
+<li><strong>prev, next:</strong> 当前内存块的上一个和下一个内存块的地址，用于组织成链表结构方便重置和释放。</li>
+<li>**freeptr: **指向当前内存块中空闲空间的首地址</li>
+<li><strong>endptr:</strong> 指向当前内存块的尾地址</li>
+</ul>
+<p>一个内存块的物理结构形式如下，前面是控制结构，后面是实际使用的空间。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">++++++++++++++++++
++ AllocBlockData +
+++++++++++++++++++
++   used space   +
++   free space   +
++   free space   +
+++++++++++++++++++
+</code></pre></td></tr></table>
+</div>
+</div><p>通过AllocBlockData结构的注释我们可以知道，AllocBlock内存块是aset.c向操作系统申请内存的最小单元结构。AllocBlock内存块中包含了很多AllocChunks内存片，内存片是palloc,pfree操纵的内存单元结构。内存片释放后会归还到AllocSetContext的空闲列表中，而不是归还给操作系统。</p>
+<h4 id="allocchunk">AllocChunk</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/*
+</span><span class="cm"> * AllocChunk
+</span><span class="cm"> *		The prefix of each piece of memory in an AllocBlock
+</span><span class="cm"> *
+</span><span class="cm"> * NB: this MUST match StandardChunkHeader as defined by utils/memutils.h.
+</span><span class="cm"> */</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">AllocChunkData</span>
+<span class="p">{</span>
+	<span class="cm">/* aset is the owning aset if allocated, or the freelist link if free */</span>
+	<span class="kt">void</span>	   <span class="o">*</span><span class="n">aset</span><span class="p">;</span>
+	<span class="cm">/* size is always the size of the usable space in the chunk */</span>
+	<span class="n">Size</span>		<span class="n">size</span><span class="p">;</span>
+<span class="cp">#ifdef MEMORY_CONTEXT_CHECKING
+</span><span class="cp"></span>	<span class="cm">/* when debugging memory usage, also store actual requested size */</span>
+	<span class="cm">/* this is zero in a free chunk */</span>
+	<span class="n">Size</span>		<span class="n">requested_size</span><span class="p">;</span>
+<span class="cp">#endif
+</span><span class="cp"></span><span class="p">}</span>	<span class="n">AllocChunkData</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="n">AllocChunkData</span> <span class="o">*</span> <span class="n">AllocChunk</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>aset:</strong> aset是一个多重复用指针，内存片被使用时指向内存上下文地址; 内存片被释放时指向内存块的freelist(相当于单向链表的next指针)</li>
+<li>**size: **内存片分配的可用空间大小</li>
+<li><strong>requested_size:</strong> 用户申请时申请的内存大小</li>
+</ul>
+<p>一个内存片的物理结构形式如下，前面是控制结构，后面是实际使用的空间。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">++++++++++++++++++
++ AllocChunkData +
+++++++++++++++++++
++   alloc space  +
+++++++++++++++++++
+</code></pre></td></tr></table>
+</div>
+</div><p>内存片是内存块被分割使用形成的一个个内存片段，内存片空间的开头是AllocChunkData结构，后面是该内存片的用户实际使用空间，palloc返回的是用户实际使用空间的首地址。内存片有两种状态被使用和被释放，同时存在于内存块当中。内存片被释放时仅仅是将内存片记录到AllocSetContext的freelist当中，并不进行内存的移动和归还给操作系统。</p>
+<h4 id="freelist">freelist</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">AllocSetContext</span>
+<span class="p">{</span>
+        <span class="n">MemoryContextData</span> <span class="n">header</span><span class="p">;</span>       <span class="cm">/* Standard memory-context fields */</span>
+        <span class="cm">/* ... */</span>
+        <span class="n">AllocChunk</span>      <span class="n">freelist</span><span class="p">[</span><span class="n">ALLOCSET_NUM_FREELISTS</span><span class="p">];</span>               <span class="cm">/* free chunk lists */</span>
+        <span class="cm">/* ... */</span>
+<span class="p">}</span> <span class="n">AllocSetContext</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>操作系统内核只提供了很基础的物理内存的映射接口，应用程序使用的malloc,free只是glibc对内存管理的一种实现。通过文章开头可以看到用户态的内存管理有很多种实现方式。不管哪种方式， 对空闲内存的管理往往代表着该种方式的效率。PG里的内存上下文管理，相当于在glibc等实现的基础之上，又在应用层进行自己的内存管理。同样freelist管理也很重要。每个内存上下文的AllocSetContext结构中都维护着一个freelist</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/*--------------------
+</span><span class="cm"> * Chunk freelist k holds chunks of size 1 &lt;&lt; (k + ALLOC_MINBITS),
+</span><span class="cm"> * for k = 0 .. ALLOCSET_NUM_FREELISTS-1.
+</span><span class="cm"> *
+</span><span class="cm"> * Note that all chunks in the freelists have power-of-2 sizes.  This
+</span><span class="cm"> * improves recyclability: we may waste some space, but the wasted space
+</span><span class="cm"> * should stay pretty constant as requests are made and released.
+</span><span class="cm"> *
+</span><span class="cm"> * A request too large for the last freelist is handled by allocating a
+</span><span class="cm"> * dedicated block from malloc().  The block still has a block header and
+</span><span class="cm"> * chunk header, but when the chunk is freed we&#39;ll return the whole block
+</span><span class="cm"> * to malloc(), not put it on our freelists.
+</span><span class="cm"> *
+</span><span class="cm"> * CAUTION: ALLOC_MINBITS must be large enough so that
+</span><span class="cm"> * 1&lt;&lt;ALLOC_MINBITS is at least MAXALIGN,
+</span><span class="cm"> * or we may fail to align the smallest chunks adequately.
+</span><span class="cm"> * 8-byte alignment is enough on all currently known machines.
+</span><span class="cm"> *
+</span><span class="cm"> * With the current parameters, request sizes up to 8K are treated as chunks,
+</span><span class="cm"> * larger requests go into dedicated blocks.  Change ALLOCSET_NUM_FREELISTS
+</span><span class="cm"> * to adjust the boundary point; and adjust ALLOCSET_SEPARATE_THRESHOLD in
+</span><span class="cm"> * memutils.h to agree.  (Note: in contexts with small maxBlockSize, we may
+</span><span class="cm"> * set the allocChunkLimit to less than 8K, so as to avoid space wastage.)
+</span><span class="cm"> *--------------------
+</span><span class="cm"> */</span>
+
+<span class="cp">#define ALLOC_MINBITS           3       </span><span class="cm">/* smallest chunk size is 8 bytes */</span><span class="cp">
+</span><span class="cp">#define ALLOCSET_NUM_FREELISTS  11
+</span><span class="cp">#define ALLOC_CHUNK_LIMIT       (1 &lt;&lt; (ALLOCSET_NUM_FREELISTS-1+ALLOC_MINBITS))
+</span><span class="cp"></span><span class="cm">/* Size of largest chunk that we use a fixed size for */</span>
+<span class="cp">#define ALLOC_CHUNK_FRACTION    4
+</span><span class="cp"></span><span class="cm">/* We allow chunks to be at most 1/4 of maxBlockSize (less overhead) */</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>freelist结构：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    + 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 +
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ck11      ck22       ck41       ck23          ck32
+    ck21      ck31                  ck42
+                                    ck12
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    注：这些ck分别表示指向不同block的chunk，同一个链上的chunk大小一样
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>AllocSetContext</strong>结构中freelist是一个定长指针数组（默认长度为ALLOCSET_NUM_FREELISTS），数组里每一项都存了一种按空闲内存片大小分的不同的空闲内存片链表的头指针。</li>
+<li><strong>freelist</strong>的第k个位置存储大小为2^(k+ALLOC_MINBITS)的空闲内存片组成的链表，k从0到ALLOCSET_NUM_FREELISTS-1。例如：数组下标0位置保存8字节的内存片，下标1位置保存16字节的内存片，以此类推，freelist中可以保存的最大的内存片为8k字节。</li>
+<li>内存片大小都是2的次幂，这意味着一些空间的浪费。</li>
+<li>如果一次内存申请超过内存片大小限制，那么将创建一个只有一个内存片的特殊内存块，释放时直接归还操作系统，而不是加入freelist中。</li>
+</ul>
+<h2 id="13原理图">1.3原理图</h2>
+<p><img src="/MemoryPool-03.jpg" alt="Local Picture" title="Local Picture"></p>
+<h2 id="14算法实现">1.4算法实现</h2>
+<h4 id="allocsetcontextcreate">AllocSetContextCreate</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/* 1. 调用标准内存上下文创建接口创建内存上下文，并设置init,next,max大小 */</span>
+<span class="n">set</span> <span class="o">=</span> <span class="p">(</span><span class="n">AllocSet</span><span class="p">)</span> <span class="n">MemoryContextCreate</span><span class="p">(</span><span class="n">T_AllocSetContext</span><span class="p">,</span>
+                                <span class="k">sizeof</span><span class="p">(</span><span class="n">AllocSetContext</span><span class="p">),</span>
+                                <span class="o">&amp;</span><span class="n">AllocSetMethods</span><span class="p">,</span>
+                                <span class="n">parent</span><span class="p">,</span>
+                                <span class="n">name</span><span class="p">);</span>
+
+<span class="cm">/* 2. 设置内存上下的增长大小和限制 */</span>
+<span class="n">set</span><span class="o">-&gt;</span><span class="n">initBlockSize</span><span class="p">;</span> <span class="c1">//第一个内存块大小，最小1KB
+</span><span class="c1"></span><span class="n">set</span><span class="o">-&gt;</span><span class="n">nextBlockSize</span><span class="p">;</span> <span class="c1">//下一个内存块大小，每次翻倍增长，达到maxBlockSize后不再增长。
+</span><span class="c1"></span><span class="n">set</span><span class="o">-&gt;</span><span class="n">maxBlockSize</span><span class="p">;</span>  <span class="c1">//最大的内存块大小
+</span><span class="c1"></span><span class="n">set</span><span class="o">-&gt;</span><span class="n">allocChunkLimit</span><span class="p">;</span> <span class="c1">//内存片大小限制，不能大于freelist限制
+</span><span class="c1"></span>
+<span class="cm">/* 为该内存块计算内存片的最大限制，由于freelist的长度，首先内存片大小不能大于ALLOC_CHUNK_LIMIT
+</span><span class="cm"> * 通常情况maxBlockSize都是2的整数次幂，内存片最大是maxBlockSize的1/8
+</span><span class="cm"> * 先将allocChunkLimit设置为默认最大限制ALLOC_CHUNK_LIMIT，然后只要allocChunkLimit + ALLOC_CHUNKHDRSZ大于“最大内存块可用空间的1/4”，则对allocChunkLimit除2。
+</span><span class="cm"> */</span>
+<span class="n">set</span><span class="o">-&gt;</span><span class="n">allocChunkLimit</span> <span class="o">=</span> <span class="n">ALLOC_CHUNK_LIMIT</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">((</span><span class="n">Size</span><span class="p">)</span> <span class="p">(</span><span class="n">set</span><span class="o">-&gt;</span><span class="n">allocChunkLimit</span> <span class="o">+</span> <span class="n">ALLOC_CHUNKHDRSZ</span><span class="p">)</span> <span class="o">&gt;</span>
+        <span class="p">(</span><span class="n">Size</span><span class="p">)</span> <span class="p">((</span><span class="n">maxBlockSize</span> <span class="o">-</span> <span class="n">ALLOC_BLOCKHDRSZ</span><span class="p">)</span> <span class="o">/</span> <span class="n">ALLOC_CHUNK_FRACTION</span><span class="p">))</span>
+    <span class="n">set</span><span class="o">-&gt;</span><span class="n">allocChunkLimit</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="cm">/* 3. 是否提前给内存上下文分配内存块 */</span>
+<span class="cm">/* 如果设置了minContextSize，并且minContextSize大于最小的大小(ALLOC_BLOCKHDRSZ + ALLOC_CHUNKHDRSZ)则提前创建好一个内存块。
+</span><span class="cm"> * 内存上下文创建时minContextSize一般都为0，只有ErrorContext才设置为8k，以便即使是内存不足时，在错误处理流程中仍有内存空间使用。
+</span><span class="cm"> */</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="allocsetalloc">AllocSetAlloc</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/* 1. 看用户请求的内存大小是否超过了内存片大小限制（内存块的1/8） */</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">size</span> <span class="o">&gt;</span> <span class="n">set</span><span class="o">-&gt;</span><span class="n">allocChunkLimit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/*如果超过了，则为该请求分配一个特殊的大内存块（仅含单个内存片，并且释放时立即归还给操作系统）
+</span><span class="cm">     * 将新建block放到block链表中顶部活跃block的后面，也就是第二个位置
+</span><span class="cm">     * 如果放到链表第一个位置，那么顶部活跃block的空闲空间由于尚未加入freelist将被永远浪费
+</span><span class="cm">     */</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="p">(</span><span class="n">AllocBlock</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="n">size</span> <span class="o">+</span> <span class="n">ALLOC_BLOCKHDRSZ</span> <span class="o">+</span> <span class="n">ALLOC_CHUNKHDRSZ</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">chunk</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* 2. 按申请大小查找相应的freelist中的链表，看有无空闲chunk可用 */</span>
+<span class="n">fidx</span> <span class="o">=</span> <span class="n">AllocSetFreeIndex</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+<span class="n">chunk</span> <span class="o">=</span> <span class="n">set</span><span class="o">-&gt;</span><span class="n">freelist</span><span class="p">[</span><span class="n">fidx</span><span class="p">];</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">chunk</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">set</span><span class="o">-&gt;</span><span class="n">freelist</span><span class="p">[</span><span class="n">fidx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">AllocChunk</span><span class="p">)</span> <span class="n">chunk</span><span class="o">-&gt;</span><span class="n">aset</span><span class="p">;</span>
+    <span class="n">chunk</span><span class="o">-&gt;</span><span class="n">aset</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="n">set</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">chunk</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* 3. 看内存块链表顶部的活跃block中是否有空间可分配 */</span>
+<span class="k">if</span> <span class="p">((</span><span class="n">block</span> <span class="o">=</span> <span class="n">set</span><span class="o">-&gt;</span><span class="n">blocks</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Size</span> <span class="n">availspace</span> <span class="o">=</span> <span class="n">block</span><span class="o">-&gt;</span><span class="n">endptr</span> <span class="o">-</span> <span class="n">block</span><span class="o">-&gt;</span><span class="n">freeptr</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">availspace</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">chunk_size</span> <span class="o">+</span> <span class="n">ALLOC_CHUNKHDRSZ</span><span class="p">))</span> <span class="p">{</span>
+        <span class="cm">/* 顶部活跃内存块的剩余空间不满足申请大小时，需要将其剩余空间全部变成空闲chunk加入到freelist中 */</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">availspace</span> <span class="o">&gt;=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">ALLOC_MINBITS</span><span class="p">)</span> <span class="o">+</span> <span class="n">ALLOC_CHUNKHDRSZ</span><span class="p">))</span> <span class="p">{</span>
+            <span class="cm">/* 如果剩余空间大于freelist中最小大小+ALLOC_CHUNKHDRSZ */</span>
+            <span class="n">Size</span> <span class="n">availchunk</span> <span class="o">=</span> <span class="n">availspace</span> <span class="o">-</span> <span class="n">ALLOC_CHUNKHDRSZ</span><span class="p">;</span>
+            <span class="kt">int</span> <span class="n">a_fidx</span> <span class="o">=</span> <span class="n">AllocSetFreeIndex</span><span class="p">(</span><span class="n">availchunk</span><span class="p">);</span>
+
+            <span class="cm">/* 
+</span><span class="cm">             * In most cases, we&#39;ll get back the index of the next larger
+</span><span class="cm">             * freelist than the one we need to put this chunk on.  The
+</span><span class="cm">             * exception is when availchunk is exactly a power of 2.
+</span><span class="cm">             */</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">availchunk</span> <span class="o">!=</span> <span class="p">((</span><span class="n">Size</span><span class="p">)</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">a_fidx</span> <span class="o">+</span> <span class="n">ALLOC_MINBITS</span><span class="p">)))</span>
+            <span class="p">{</span>
+                <span class="n">a_fidx</span><span class="o">--</span><span class="p">;</span>
+                <span class="n">availchunk</span> <span class="o">=</span> <span class="p">((</span><span class="n">Size</span><span class="p">)</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">a_fidx</span> <span class="o">+</span> <span class="n">ALLOC_MINBITS</span><span class="p">));</span>
+            <span class="p">}</span>
+
+            <span class="n">chunk</span> <span class="o">=</span> <span class="p">(</span><span class="n">AllocChunk</span><span class="p">)</span> <span class="p">(</span><span class="n">block</span><span class="o">-&gt;</span><span class="n">freeptr</span><span class="p">);</span>
+            <span class="n">block</span><span class="o">-&gt;</span><span class="n">freeptr</span> <span class="o">+=</span> <span class="p">(</span><span class="n">availchunk</span> <span class="o">+</span> <span class="n">ALLOC_CHUNKHDRSZ</span><span class="p">);</span>
+            <span class="n">availspace</span> <span class="o">-=</span> <span class="p">(</span><span class="n">availchunk</span> <span class="o">+</span> <span class="n">ALLOC_CHUNKHDRSZ</span><span class="p">);</span>
+            <span class="n">chunk</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="n">availchunk</span><span class="p">;</span>
+            <span class="n">chunk</span><span class="o">-&gt;</span><span class="n">aset</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="n">set</span><span class="o">-&gt;</span><span class="n">freelist</span><span class="p">[</span><span class="n">a_fidx</span><span class="p">];</span>
+            <span class="n">set</span><span class="o">-&gt;</span><span class="n">freelist</span><span class="p">[</span><span class="n">a_fidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="cm">/* 需要分配新的内存块 */</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/* 4. 没有内存块或活跃内存块空间不足时，分配新的内存块 */</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">block</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="cm">/*分配一个新的内存块*/</span>
+<span class="p">}</span>
+
+<span class="cm">/* 5. 从当前可用内存块中分配内存片 */</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="allocsetrealloc">AllocSetRealloc</h4>
+<p>Realloc用户申请的内存片。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cm">/* 1. 因为申请size在分配内存时已经按2的整数次幂对齐了，因此有可能oldsize已经大于了newsize */</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">oldsize</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">pointer</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* 2. 大于set-&gt;allocChunkLimit的叫做单内存片的超大内存块，直接relloc */</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">oldsize</span> <span class="o">&gt;</span> <span class="n">set</span><span class="o">-&gt;</span><span class="n">allocChunkLimit</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="p">(</span><span class="n">AllocBlock</span><span class="p">)</span> <span class="n">realloc</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">blksize</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">pointer</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* 3. 分配新大小的内存片，拷贝内容后，释放旧的内存片 */</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="allocsetfree">AllocSetFree</h4>
+<p>释放用户申请的内存片，由pfree调用。</p>
+<ul>
+<li>如果该内存片是个超大内存片（超过正常内存片限制，所在内存块仅含该内存片），则直接归还给操作系统</li>
+<li>否则，将该内存片加入到freelist中</li>
+</ul>
+<h4 id="allocsetdelete">AllocSetDelete</h4>
+<p>将内存上下文所有的内存块归还给操作系统。</p>
+<ul>
+<li>清空set-&gt;freelist</li>
+<li>释放set-&gt;blocks中所有block，包括set-&gt;keeper</li>
+</ul>
+<h4 id="allocsetreset">AllocSetReset</h4>
+<p>重置内存上下文，仅保留内存块链表顶部的活跃内存块。</p>
+<ul>
+<li>清空set-&gt;freelist</li>
+<li>释放set-&gt;keeper以外的其它set-&gt;blocks，再把set-&gt;blocks设置为set-&gt;keeper</li>
+<li>set-&gt;nextBlockSize设置为set-&gt;initBlockSize</li>
+</ul>
+<h4 id="allocsetisempty">AllocSetIsEmpty</h4>
+<p>内存上下文是否是空的，其实是除了keeper（第一次分配的内存块）以为是否包含其它内存块。</p>
+<h4 id="allocsetstats">AllocSetStats</h4>
+<p>统计内存上下文的内存块数，内存片数，总空间大小，剩余空间大小。</p>
 
     </div>
 
