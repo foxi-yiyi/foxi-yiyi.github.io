@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.75.1 with theme even" />
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
 
 
 <link rel="canonical" href="https://foxi-yiyi.github.io/post/gnu.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" />
@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="17007">
+<meta itemprop="wordCount" content="17008">
 
 
 
@@ -965,7 +965,7 @@
 <p>扩展变量的规则是什么，这些规则有什么用处？当make运行的时候，会以两个阶段完成它的工作，首先会读取makefile以及被引入的任何其他makefile。第二个阶段make会分析易存图并判断需要更新的工作目标，然后执行脚本以完成需要更新的动作。</p>
 <p>当make处理递归变量或者define的时候，会将变量里的每一行或者宏的主体存储起来，包括行符号，但是不会进行扩展。</p>
 <p>当宏扩展的时候，make会立即扫描被扩展的文本中是否存在宏的变量的引用，如果存在就予以扩展，如此递归下去。如果宏是在命令脚本语境中被扩展的，则宏主体的每一行都会插入一个前导的跳格符。</p>
-<p>下面是如何用处理&quot;<strong>makefile中的元素何时被扩展</strong>&ldquo;的准则：</p>
+<p>下面是如何用处理&rdquo;<strong>makefile中的元素何时被扩展</strong>&ldquo;的准则：</p>
 <ul>
 <li>对于变量赋值，make会在第一阶段读取改行的时候，立即扩展赋值运算符左边的部分；</li>
 <li>=和?=的右侧部分被延后到它们被使用的时候才扩展，并在第二阶段进行；</li>

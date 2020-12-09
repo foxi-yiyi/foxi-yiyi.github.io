@@ -2,6 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F02%E7%BA%BF%E7%A8%8B%E5%92%8C%E5%B9%B6%E5%8F%91/</loc>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F03cpu%E8%B0%83%E5%BA%A6/</loc>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E5%BF%B5%E7%AC%AC%E4%B8%83%E7%89%88/</loc>
+    <lastmod>2020-11-04T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://foxi-yiyi.github.io/post/postgresql%E5%86%85%E5%AD%98%E6%B1%A0%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/</loc>
     <lastmod>2020-09-28T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -59,14 +80,42 @@
   
   <url>
     <loc>https://foxi-yiyi.github.io/categories/</loc>
-    <lastmod>2020-09-28T00:00:00+08:00</lastmod>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/categories/computer-science/</loc>
-    <lastmod>2020-09-28T00:00:00+08:00</lastmod>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/</loc>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/tags/os/</loc>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/post/</loc>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/tags/</loc>
+    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -79,28 +128,7 @@
   </url>
   
   <url>
-    <loc>https://foxi-yiyi.github.io/</loc>
-    <lastmod>2020-09-28T00:00:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://foxi-yiyi.github.io/tags/postgresql/</loc>
-    <lastmod>2020-09-28T00:00:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://foxi-yiyi.github.io/post/</loc>
-    <lastmod>2020-09-28T00:00:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://foxi-yiyi.github.io/tags/</loc>
     <lastmod>2020-09-28T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -115,13 +143,6 @@
   
   <url>
     <loc>https://foxi-yiyi.github.io/tags/c%E8%AF%AD%E8%A8%80/</loc>
-    <lastmod>2020-08-21T00:00:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://foxi-yiyi.github.io/tags/os/</loc>
     <lastmod>2020-08-21T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
