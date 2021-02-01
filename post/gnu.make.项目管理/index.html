@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.74.3 with theme even" />
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
 
 
 <link rel="canonical" href="https://foxi-yiyi.github.io/post/gnu.make.%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" />
@@ -35,7 +35,7 @@
 
 
 
-<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -49,7 +49,7 @@
 <meta itemprop="description" content="第一章 规则 1.1规则 具体规则 ​ 具体规则指的是用特定的文件为工作目标的必要条件，每个规则都可以有多个工作目标。形式如： 1 vpath.o variable.o : make.h config.h dep.h 这代表vp">
 <meta itemprop="datePublished" content="2020-08-28T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2020-08-28T00:00:00+08:00" />
-<meta itemprop="wordCount" content="17008">
+<meta itemprop="wordCount" content="17007">
 
 
 
@@ -93,12 +93,21 @@
         <li class="mobile-menu-item">About</li>
       </a>
   </ul>
+
+  
+
+
 </nav>
+
   <div class="container" id="mobile-panel">
     <header id="header" class="header">
         <div class="logo-wrapper">
   <a href="/" class="logo">Moeah&#39;s BLOG</a>
 </div>
+
+
+
+
 
 <nav class="site-navbar">
   <ul id="menu" class="menu">
@@ -115,6 +124,7 @@
       </li>
   </ul>
 </nav>
+
     </header>
 
     <main id="main" class="main">
@@ -965,7 +975,7 @@
 <p>扩展变量的规则是什么，这些规则有什么用处？当make运行的时候，会以两个阶段完成它的工作，首先会读取makefile以及被引入的任何其他makefile。第二个阶段make会分析易存图并判断需要更新的工作目标，然后执行脚本以完成需要更新的动作。</p>
 <p>当make处理递归变量或者define的时候，会将变量里的每一行或者宏的主体存储起来，包括行符号，但是不会进行扩展。</p>
 <p>当宏扩展的时候，make会立即扫描被扩展的文本中是否存在宏的变量的引用，如果存在就予以扩展，如此递归下去。如果宏是在命令脚本语境中被扩展的，则宏主体的每一行都会插入一个前导的跳格符。</p>
-<p>下面是如何用处理&rdquo;<strong>makefile中的元素何时被扩展</strong>&ldquo;的准则：</p>
+<p>下面是如何用处理&quot;<strong>makefile中的元素何时被扩展</strong>&ldquo;的准则：</p>
 <ul>
 <li>对于变量赋值，make会在第一阶段读取改行的时候，立即扩展赋值运算符左边的部分；</li>
 <li>=和?=的右侧部分被延后到它们被使用的时候才扩展，并在第二阶段进行；</li>
@@ -2204,13 +2214,10 @@ he% matches: he hen
   <span class="copyright-year">
     &copy; 
     2017 - 
-    2020
-    <span class="heart">
-      <i class="iconfont icon-heart"></i>
-    </span>
-    <span class="author">foxi-yiyi</span>
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>foxi-yiyi</span>
   </span>
 </div>
+
     </footer>
 
     <div class="back-to-top" id="back-to-top">
@@ -2224,14 +2231,14 @@ he% matches: he hen
 
 
 
-<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
   <script type="text/javascript">
     window.MathJax = {
-      showProcessingMessages: false,
-      messageStyle: 'none'
+      tex: {
+        }
     };
   </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
 
 
 
