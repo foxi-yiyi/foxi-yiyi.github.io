@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Makefile on Moeah&#39;s BLOG</title>
+    <link>https://foxi-yiyi.github.io/tags/makefile/</link>
+    <description>Recent content in Makefile on Moeah&#39;s BLOG</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 15 Jun 2021 00:00:00 +0800</lastBuildDate>
+    
+	<atom:link href="https://foxi-yiyi.github.io/tags/makefile/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>autotool工具的使用方式（简单的例子）</title>
+      <link>https://foxi-yiyi.github.io/post/autotool%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90/</link>
+      <pubDate>Tue, 15 Jun 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://foxi-yiyi.github.io/post/autotool%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90/</guid>
+      <description>autotool工具的使用方式（简单的例子） autotool是一种帮助用户自动管理项目生成Makefile的工具。有时候手动写Makefil</description>
+    </item>
+    
+  </channel>
+</rss>

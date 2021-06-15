@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://foxi-yiyi.github.io/post/autotool%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90/</loc>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://foxi-yiyi.github.io/post/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F02%E7%BA%BF%E7%A8%8B%E5%92%8C%E5%B9%B6%E5%8F%91/</loc>
     <lastmod>2020-12-09T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -79,42 +86,56 @@
   </url>
   
   <url>
+    <loc>https://foxi-yiyi.github.io/tags/autotool/</loc>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://foxi-yiyi.github.io/categories/</loc>
-    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/categories/computer-science/</loc>
-    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/tags/makefile/</loc>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/</loc>
-    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://foxi-yiyi.github.io/tags/os/</loc>
-    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/post/</loc>
-    <lastmod>2020-12-09T00:00:00+08:00</lastmod>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://foxi-yiyi.github.io/tags/</loc>
+    <lastmod>2021-06-15T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://foxi-yiyi.github.io/tags/os/</loc>
     <lastmod>2020-12-09T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -277,12 +298,6 @@
   <url>
     <loc>https://foxi-yiyi.github.io/syntax-highlighting/</loc>
     <lastmod>2018-11-05T16:01:23+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://foxi-yiyi.github.io/post/autotool%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
