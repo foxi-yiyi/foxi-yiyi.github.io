@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title> - Moeah&#39;s BLOG</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="foxi-yiyi" /><meta name="description" content="autotool工具的使用方式（简单的例子） autotool是一种帮助用户自动管理项目生成Makefile的工具。有时候手动写Makefil" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="https://foxi-yiyi.github.io/post/autotool%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="autotool工具的使用方式（简单的例子） autotool是一种帮助用户自动管理项目生成Makefile的工具。有时候手动写Makefil" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://foxi-yiyi.github.io/post/autotool%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90/" />
+
+<meta itemprop="name" content="">
+<meta itemprop="description" content="autotool工具的使用方式（简单的例子） autotool是一种帮助用户自动管理项目生成Makefile的工具。有时候手动写Makefil">
+
+<meta itemprop="wordCount" content="2964">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="autotool工具的使用方式（简单的例子） autotool是一种帮助用户自动管理项目生成Makefile的工具。有时候手动写Makefil"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Moeah&#39;s BLOG</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Moeah&#39;s BLOG</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title"></h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#autotool工具的使用方式简单的例子">autotool工具的使用方式（简单的例子）</a>
+      <ul>
+        <li><a href="#makefileam的作用">Makefile.am的作用</a></li>
+        <li><a href="#makefileam的基本例子简单的写法教程">Makefile.am的基本例子（简单的写法教程)</a>
+          <ul>
+            <li><a href="#makefileam和shared-library">Makefile.am和shared library</a></li>
+            <li><a href="#与库共享代码">与库共享代码</a></li>
+            <li><a href="#安装头文件">安装头文件</a></li>
+            <li><a href="#安装数据文件">安装数据文件</a></li>
+            <li><a href="#将子目录添加到构建">将子目录添加到构建</a></li>
+          </ul>
+        </li>
+        <li><a href="#0代码前期准备">0.代码前期准备</a></li>
+        <li><a href="#编写makefileam">编写Makefile.am</a></li>
+        <li><a href="#执行autotool-操作">执行autotool 操作</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="autotool工具的使用方式简单的例子">autotool工具的使用方式（简单的例子）</h1>
+<blockquote>
+<p>autotool是一种帮助用户自动管理项目生成Makefile的工具。有时候手动写Makefile可以满足自己的要求，但是随着项目增加，代码结构也变得非常复杂，这样一来手动维护每个Makefile就变得非常困难。</p>
+<p>autotool的存在帮助降低了项目维护的难度。</p>
+</blockquote>
+<p>autotool不是某一个工具，而是一系列工具的混合体。</p>
+<p>autoscan</p>
+<p>aclocal</p>
+<p>autoconf</p>
+<p>autoheader</p>
+<p>automake</p>
+<p>这一系列最终目的就是生成makefile，进而帮助项目编译。</p>
+<hr>
+<h2 id="makefileam的作用">Makefile.am的作用</h2>
+<p><strong>Makefile.am</strong>文件是整个autotool自动生成makefile的灵魂，这其中不需要规定多么复杂的逻辑生成关系。这里对这个内容进行着重介绍。</p>
+<ul>
+<li>
+<p>终极目标</p>
+<p>automake通过Makefile.am来生成Makefile.in。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bin_PROGRAMS(*program-list*)</code></td>
+<td>a program or programs build in the local directory that should be compiled, linked and installed.</td>
+</tr>
+<tr>
+<td><code>noinst_PROGRAMS(*program-list*)</code></td>
+<td>a program or programs build in the local directory that should be compiled, linked but not installed.</td>
+</tr>
+<tr>
+<td><code>bin_SCRIPTS(*script-list*)</code></td>
+<td>a script or scripts build in the local directory that should be installed.</td>
+</tr>
+<tr>
+<td><code>man_MANS(*page-list*)</code></td>
+<td>man pages that should be installed.</td>
+</tr>
+<tr>
+<td><code>lib_LTLIBRARIES(*lib-list*)</code></td>
+<td>a library or libraries that should be built using <code>libtool</code>.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<p>命名方案</p>
+<p>automake使用统一的命名规则，此举可以使工具明确需要构建的内容。</p>
+<p>PROGRAMS：（<code>bin_PROGRAMS</code>  <code>sbin_PROGRAMS</code>  <code>noinst_PROGRAMS</code>  etc）</p>
+<ul>
+<li><code>PROGRAMS</code>—用来生成可执行二进制文件的参数，多数为C/C++，lex，yacc，或者需要依赖工具。</li>
+<li><code>LIBRARIES</code>—生成二进制文件/分发软件的中间形式文件。</li>
+<li><code>LISP</code> (yeah, right)</li>
+<li><code>PYTHON</code></li>
+<li><code>JAVA</code></li>
+<li><code>SCRIPTS</code>—for distribution in the package; an artificial intermediate source is established, usually the resulting script name unsurprisingly suffixed with <em>.in</em>.</li>
+<li><code>DATA</code> (beats me so far)</li>
+<li><code>MANS</code>—生成使用手册</li>
+</ul>
+</li>
+<li>
+<p>隐藏变量</p>
+<p>automake会有一些预留的参数，例如<code>AM_CFLAGS</code></p>
+</li>
+<li>
+<p>源文件、头文件、库文件</p>
+<p>为每个目标文件指定源文件。</p>
+<p>生成的目标文件名称 + _ + SOURCES  =  源文件列表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"> lockproj_SOURCES                  = main.c
+ lib_LTLIBRARIES                   = libpthread_rwlock_fcfs.la
+ libpthread_rwlock_fcfs_la_SOURCES = rwlock.c queue.c
+ libpthread_rwlock_fcfs_la_HEADERS = rwlock_fcfs.h
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h2 id="makefileam的基本例子简单的写法教程">Makefile.am的基本例子（简单的写法教程)</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># Notice the bin_ prefix.
+</span><span class="c"></span><span class="nv">bin_PROGRAMS</span> <span class="o">=</span> kdialog
+
+<span class="nv">kdialog_SOURCES</span> <span class="o">=</span> kdialog.cpp widgets.cpp
+<span class="nv">kdialog_LDADD</span> <span class="o">=</span> <span class="k">$(</span>LIB_KIO<span class="k">)</span>
+<span class="nv">kdialog_LDFLAGS</span> <span class="o">=</span> <span class="k">$(</span>all_libraries<span class="k">)</span> <span class="k">$(</span>KDE_RPATH<span class="k">)</span>
+
+<span class="nv">AM_CPPFLAGS</span> <span class="o">=</span> <span class="k">$(</span>all_includes<span class="k">)</span>
+
+<span class="nv">METASOURCES</span> <span class="o">=</span> AUTO
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>bin</p>
+<p><code>bin</code>指的是想要创建的文件，这些文件会被安装在<code>KDE</code>中的bin目录。</p>
+<p><code>*_PROGRAMS</code>指的就是想要编译的内容。</p>
+<p><code>_SCRIPTS</code>指的是需要安装的脚本文件。</p>
+</li>
+<li>
+<p>_SOURCES</p>
+<p>对于<code>PROGRAMS</code>中列举出来的所有需要编译的文件都要在这里列举。</p>
+<p><strong>注意不要列举头文件，和一些在构建过程中用不到的文件</strong></p>
+</li>
+<li>
+<p>_LDADD</p>
+<p>这个参数列举了构建过程中需要链接的库文件。</p>
+<ul>
+<li>传给gcc的参数：-lfoo</li>
+<li>某个库文件的路径  (../path/to/thelib.la)</li>
+<li>KDE编译系统定义的某个路径宏 ($LIB_KIO)</li>
+</ul>
+<p>如果某个库A依赖于库B，这里不必列出库B。</p>
+</li>
+<li>
+<p>LDFLAGS</p>
+<p>定义了所有编译需要的flags选项。</p>
+</li>
+<li>
+<p>KDE_CXXFLAGS</p>
+<p>一般来说是在其他flags后面作为编译选项的补充</p>
+</li>
+</ul>
+<hr>
+<h3 id="makefileam和shared-library">Makefile.am和shared library</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">AM_CPPFLAGS</span> <span class="o">=</span> <span class="k">$(</span>all_includes<span class="k">)</span>
+   
+<span class="nv">lib_LTLIBRARIES</span> <span class="o">=</span> libkonq.la
+   
+<span class="nv">libkonq_la_LIBADD</span> <span class="o">=</span> <span class="k">$(</span>LIB_KPARTS<span class="k">)</span>
+<span class="nv">libkonq_la_LDFLAGS</span> <span class="o">=</span> <span class="k">$(</span>all_libraries<span class="k">)</span> -version-info 6:0:2 -no-undefined
+<span class="nv">libkonq_la_SOURCES</span> <span class="o">=</span> popupmenu.cc knewmenu.cpp ...
+   
+<span class="nv">METASOURCES</span> <span class="o">=</span> AUTO
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>lib</p>
+<p><code>lib_</code> prex指的是将会被安装到<code>lib/</code>目录下的lib库文件，接着就是lib的名称，后缀是.la。</p>
+</li>
+<li>
+<p>_LTLIBRARIES</p>
+<p><code>LibTool libraries</code>。换句话说，这个参数使得autotool明确了lib库是通过libtool程序生成的。</p>
+</li>
+<li>
+<p>_LIBADD</p>
+<p>指的是前缀库所以来的库。需要注意的是LDADD适用于programs，而LIBADD适用于lib。</p>
+</li>
+<li>
+<p>_LDFLAGS</p>
+<p>指的是编译时候需要的参数。</p>
+</li>
+</ul>
+<hr>
+<h3 id="与库共享代码">与库共享代码</h3>
+<p>如果使用相同的编译参数、相同的代码编译成两个不同的共享库，或者是两个程序。可以将它们都附在<code>_SOURCES</code>选项后。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c"># Just as bin_ means install to /bin and lib_ means
+</span><span class="c"># install to lib/, noinst_ means not to install at all.
+</span><span class="c"></span><span class="nv">noinst_LTLIBRARIES</span> <span class="o">=</span> libcommon.la
+<span class="nv">libcommon_la_SOURCES</span> <span class="o">=</span> dirk.cpp coolo.cpp ...
+ 
+<span class="c"># no need for LIBADD or LDFLAGS, strictly speaking, but it can help
+</span><span class="c"># if e.g. this code needs $(LIBJPEG), all users of this convenience
+</span><span class="c"># lib won&#39;t have to specify it.
+</span><span class="c"></span> 
+<span class="c"># Then you can use the convenience lib:
+</span><span class="c"></span><span class="nv">mylib_la_LIBADD</span> <span class="o">=</span> libcommon.la
+<span class="nv">myprogram_LDADD</span> <span class="o">=</span> libcommon.la
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="安装头文件">安装头文件</h3>
+<p>如果想安装头文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">include_HEADERS</span> <span class="o">=</span> foo.h bar.h
+</code></pre></td></tr></table>
+</div>
+</div><p>如果类使用的是命名空间，比如KParts，那么头文件应该被安装到<code>kparts/foo.h</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">kpartsincludedir</span> <span class="o">=</span> <span class="k">$(</span>includedir<span class="k">)</span>/kparts
+<span class="nv">kpartsinclude_HEADERS</span> <span class="o">=</span> foo.h bar.h
+</code></pre></td></tr></table>
+</div>
+</div><p>第一行定义了新的路径，第二行定义了需要安装的文件。需要注意的是<code>dir</code>和<code>_HEADERS</code>必须一一对应。</p>
+<h3 id="安装数据文件">安装数据文件</h3>
+<p>为了向某个文件安装文件，需要使用dirname_DATA。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">kde_services_DATA</span> <span class="o">=</span> foo.desktop
+</code></pre></td></tr></table>
+</div>
+</div><p>为了在自定文件安装文件，必须首先定义，然后才能使用。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">myappfoodir</span> <span class="o">=</span> <span class="k">$(</span>kde_datadir<span class="k">)</span>/kmyapp
+<span class="nv">myappfoo_DATA</span> <span class="o">=</span> bar.desktop
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="将子目录添加到构建">将子目录添加到构建</h3>
+<p>正常情况下，只需要列出所有的子目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">SUBDIRS</span> <span class="o">=</span> foo bar
+</code></pre></td></tr></table>
+</div>
+</div><p>为了自动编译所有的子目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">SUBDIRS</span> <span class="o">=</span> <span class="k">$(</span>AUTODIRS<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果想编译一个可选的目录，需要使用automake的选择性条件功能，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="err">if</span> <span class="err">compile_KOPAINTER</span>
+<span class="nv">KOPAINTERDIR</span> <span class="o">=</span> kopainter
+<span class="err">endif</span>
+ 
+<span class="nv">SUBDIRS</span> <span class="o">=</span> foo bar <span class="k">$(</span>KOPAINTERDIR<span class="k">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="0代码前期准备">0.代码前期准备</h2>
+<p>代码结构：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">.
+├── include
+│   ├── abc
+│   │   └── abc.h
+│   └── hello
+│       └── hello.h
+└── src
+    └── hello.c
+<span class="c1"># 代码逻辑如上，src目录中有一个主体文件，include 有两个目录分别定义了不同的函数。</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>src/hello.c</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;hello/hello.h&#34;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;abc/abc.h&#34;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">prt</span><span class="p">()</span>
+<span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;+++++prt+++++++</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="nf">abc</span><span class="p">()</span>
+<span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;------abc------</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+        <span class="n">prt</span><span class="p">();</span>
+        <span class="n">abc</span><span class="p">();</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><p><code>include/abc/abc.h</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef __ABC_H__
+</span><span class="cp">#define __ABC_H__
+</span><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">abc</span><span class="p">();</span>
+
+<span class="cp">#endif
+</span></code></pre></td></tr></table>
+</div>
+</div><p><code>include/hello/hello.h</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef __HELLO_H__
+</span><span class="cp">#define __HELLO_H__
+</span><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">prt</span><span class="p">();</span>
+
+<span class="cp">#endif
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="编写makefileam">编写Makefile.am</h2>
+<p>回到项目中，工程个目录的<code>src</code>保存着项目的主体文件。<code>include</code>保存着头文件。</p>
+<p>Makefile.am</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">AUTOMAKE_OPTIONS</span><span class="o">=</span>foreign subdir-objects
+
+<span class="nv">SUBDIRS</span><span class="o">=</span>src
+	<span class="c1"># 表示子目录是src，也就是说除了在根目录会生成一个makefile意外，还会在</span>
+	<span class="c1"># src目录也生成一个makefile</span>
+
+<span class="nv">conf_include_dir</span><span class="o">=</span><span class="k">$(</span>top_srcdir<span class="k">)</span>/include
+	<span class="c1"># 需要注意的是，top_srcdir top_builddir都是预设好的autotool参数</span>
+	<span class="c1"># 表示的是工程的根目录，只不过这个根目录是用 . 表示的。</span>
+	
+<span class="c">#####################################################################################
+</span><span class="c"></span>
+<span class="nv">cbaincludedir</span> <span class="o">=</span> <span class="k">$(</span>includedir<span class="k">)</span>/abc
+<span class="nv">cbainclude_HEADERS</span> <span class="o">=</span> <span class="k">$(</span>conf_include_dir<span class="k">)</span>/abc/abc.h
+
+<span class="nv">helloincludedir</span> <span class="o">=</span> <span class="k">$(</span>includedir<span class="k">)</span>/hello
+<span class="nv">helloinclude_HEADERS</span> <span class="o">=</span> <span class="k">$(</span>conf_include_dir<span class="k">)</span>/hello/hello.h
+
+	<span class="c1"># nameincludedir</span>
+	<span class="c1"># nameinclude_HEADERS</span>
+	<span class="c1"># 	前文已经叙述过 _HEADERS 表示的是头文件，这里需要注意得使用相同名称的规则</span>
+
+<span class="c">####################################################################################
+</span><span class="c"></span><span class="nf">yiyi</span><span class="o">:</span>
+        <span class="nb">echo</span> <span class="k">$(</span>top_srcdir<span class="k">)</span> 				<span class="c1"># .</span>
+        <span class="nb">echo</span> <span class="k">$(</span>top_builddir<span class="k">)</span>			<span class="c1"># .</span>
+        <span class="nb">echo</span> <span class="k">$(</span>prefix<span class="k">)</span>					<span class="c1"># path/prefix</span>
+        <span class="nb">echo</span> <span class="k">$(</span>bindir<span class="k">)</span>					<span class="c1"># path/prefix/bin</span>
+        <span class="nb">echo</span> <span class="k">$(</span>libdir<span class="k">)</span>					<span class="c1"># path/prefix/lib</span>
+        <span class="nb">echo</span> <span class="k">$(</span>datadir<span class="k">)</span>					<span class="c1"># path/prefix/share</span>
+        <span class="nb">echo</span> <span class="k">$(</span>sysconfdir<span class="k">)</span>				<span class="c1"># path/prefix/etc</span>
+        <span class="nb">echo</span> <span class="k">$(</span>includedir<span class="k">)</span>				<span class="c1"># path/prefix/include</span>
+        <span class="nb">echo</span> <span class="k">$(</span>srcdir<span class="k">)</span>					<span class="c1"># .</span>
+ <span class="c1"># 这里打印出了预设好的一些很常用的变量</span>
+        
+</code></pre></td></tr></table>
+</div>
+</div><p>src/Makefile.am</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">bin_PROGRAMS</span><span class="o">=</span> hello
+	<span class="c1"># 前文叙述过，bin_PROGRAMS表示需要进行安装的二进制文件</span>
+<span class="nv">hello_SOURCES</span><span class="o">=</span> hello.c
+	<span class="c1"># 这里表示的是用于编译的文件</span>
+
+<span class="nv">AM_CPPFLAGS</span><span class="o">=</span>-I<span class="k">$(</span>top_srcdir<span class="k">)</span>/include
+	<span class="c1"># 还需要指明哪个是include目录。</span>
+	<span class="c1"># 需要注意的是，这里直接采用top_srcdir。</span>
+	<span class="c1"># 这个变量不建议在根目录使用</span>
+	<span class="c1"># 		因为top_srcdir是. 在根目录使用会导致include目录紊乱</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="执行autotool-操作">执行autotool 操作</h2>
+<p>1.<code>autoscan</code></p>
+<p>​	第一步就是执行autoscan操作，主要目的是扫描工作目录，并且生成configure.scan文件。这个configure.scan需要改为configure.ac然后修改其中的配置。</p>
+<p>2.<code>mv configure.scan configure.in</code></p>
+<p>3.<code>vim configure.in</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="c">#                                               -*- Autoconf -*-
+</span><span class="c"># Process this file with autoconf to produce a configure script.
+</span><span class="c"></span>
+<span class="err">AC_PREREQ([2.69])</span>
+	<span class="c"># 当前autotool的版本为2.69
+</span><span class="c"></span><span class="err">AC_INIT(configure-test2,</span> <span class="err">2.0,</span> <span class="err">aaa)</span>
+	<span class="c"># 需要生成的工程名称configure-test2 版本为2.0  bug报告地址为aaa
+</span><span class="c"></span><span class="err">AM_INIT_AUTOMAKE</span>
+<span class="err">AC_CONFIG_SRCDIR([src/hello.c])</span>
+	<span class="c"># 用来侦测所指定的源码文件是否存在，来确定源码目录的有效性。此处为当前目录下的hello.c
+</span><span class="c"></span><span class="err">AC_CONFIG_HEADERS([config.h])</span>
+	<span class="c"># 用于生成config.h文件，以便autoheader使用
+</span><span class="c"></span>	
+<span class="c"># Checks for programs.
+</span><span class="c"></span><span class="err">AC_PROG_CC</span>
+	<span class="c"># 用来指定编译器，如果不指定，选用默认gcc。
+</span><span class="c"></span>	
+	
+<span class="c"># Checks for libraries.
+</span><span class="c"></span>
+<span class="c"># Checks for header files.
+</span><span class="c"></span><span class="err">AC_CHECK_HEADERS([stdlib.h]</span> <span class="err">[unistd.h])</span>
+
+<span class="c"># Checks for typedefs, structures, and compiler characteristics.
+</span><span class="c"></span>
+<span class="c"># Checks for library functions.
+</span><span class="c"></span>
+<span class="err">AC_OUTPUT([Makefile</span>
+                <span class="err">src/Makefile])</span>
+                <span class="c"># 需要输出的文件名，由于涉及嵌套的makefile.am，这里会根据scan自动生成两个makefile
+</span></code></pre></td></tr></table>
+</div>
+</div><p>4.<code>aclocal</code></p>
+<p>​	扫描configure.ac文件生成aclocal.m4文件，该文件主要用于处理本地的宏定义。</p>
+<p>5.<code>autoconf</code></p>
+<p>​	将configure.ac的宏展开，生成configure脚本。</p>
+<p>6.<code>autoheader</code></p>
+<p>​	生成configure.h.in文件</p>
+<p>7.<code>automake --add-missing</code></p>
+<p>​	生成Makefile.in文件，&ndash;add-missing选项可以让automake自动添加一些必要的脚本文件，</p>
+<p>8.<code>configure</code></p>
+<p>​	可以运行configure命令，将Makefile.in生成Makefile了</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">foxi-yiyi</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/quantum-break-english-pieces/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Quantum Break English pieces</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="https://foxi-yiyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">foxi-yiyi</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
