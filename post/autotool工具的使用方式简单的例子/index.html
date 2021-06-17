@@ -49,7 +49,7 @@
 <meta itemprop="description" content="autotool工具的使用方式（简单的例子） autotool是一种帮助用户自动管理项目生成Makefile的工具。有时候手动写Makefil">
 <meta itemprop="datePublished" content="2021-06-15T00:00:00+08:00" />
 <meta itemprop="dateModified" content="2021-06-15T00:00:00+08:00" />
-<meta itemprop="wordCount" content="2964">
+<meta itemprop="wordCount" content="3786">
 
 
 
@@ -154,6 +154,12 @@
         <li><a href="#0代码前期准备">0.代码前期准备</a></li>
         <li><a href="#编写makefileam">编写Makefile.am</a></li>
         <li><a href="#执行autotool-操作">执行autotool 操作</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考附录">参考附录</a>
+      <ul>
+        <li><a href="#configureac参数">configure.ac参数</a></li>
+        <li><a href="#makefileam参数">Makefile.am参数</a></li>
       </ul>
     </li>
   </ul>
@@ -470,31 +476,6 @@
 <p>代码结构：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">.
-├── include
-│   ├── abc
-│   │   └── abc.h
-│   └── hello
-│       └── hello.h
-└── src
-    └── hello.c
-<span class="c1"># 代码逻辑如上，src目录中有一个主体文件，include 有两个目录分别定义了不同的函数。</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>src/hello.c</code></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
@@ -513,28 +494,97 @@
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span><span class="lnt">19
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&#34;hello/hello.h&#34;</span><span class="cp">
+<pre class="chroma"><code class="language-shell" data-lang="shell">├── configure.ac
+├── configure.scan
+├── include
+│   ├── abc
+│   │   └── abc.h
+│   └── prt
+│       └── prt.h
+├── Makefile.am
+└── src
+    ├── abc
+    │   └── abc.c
+    ├── hello.c
+    ├── Makefile.am
+    └── prt
+        └── prt.c
+
+
+<span class="c1"># 代码逻辑如上，src目录中有一个主体文件，include 有两个目录分别定义了不同的函数。</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>src/hello.c</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;prt/prt.h&#34;</span><span class="cp">
 </span><span class="cp">#include</span> <span class="cpf">&#34;abc/abc.h&#34;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;max.h&#34;</span><span class="cp">
+</span><span class="cp"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+        <span class="n">prt</span><span class="p">();</span>
+        <span class="n">abc</span><span class="p">();</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;[100,101] which one is bigger?</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span><span class="n">max</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">101</span><span class="p">));</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>src/abc/abc.c</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;abc/abc.h&#34;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">abc</span><span class="p">()</span>
+<span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;------abc------</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>src/prt/prt.c</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span><span class="cpf">&#34;prt/prt.h&#34;</span><span class="cp">
 </span><span class="cp"></span>
 <span class="kt">void</span> <span class="nf">prt</span><span class="p">()</span>
 <span class="p">{</span>
         <span class="n">printf</span><span class="p">(</span><span class="s">&#34;+++++prt+++++++</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
 <span class="p">}</span>
-<span class="kt">void</span> <span class="nf">abc</span><span class="p">()</span>
-<span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;------abc------</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-        <span class="n">prt</span><span class="p">();</span>
-        <span class="n">abc</span><span class="p">();</span>
-        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
 </code></pre></td></tr></table>
 </div>
 </div><p><code>include/abc/abc.h</code></p>
@@ -553,7 +603,7 @@
 </span><span class="cp">#define __ABC_H__
 </span><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span><span class="cp"></span>
-<span class="kt">void</span> <span class="nf">abc</span><span class="p">();</span>
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">abc</span><span class="p">();</span>
 
 <span class="cp">#endif
 </span></code></pre></td></tr></table>
@@ -570,18 +620,18 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef __HELLO_H__
-</span><span class="cp">#define __HELLO_H__
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#ifndef __PRT_H__
+</span><span class="cp">#define __PRT_H__
 </span><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span><span class="cp"></span>
-<span class="kt">void</span> <span class="nf">prt</span><span class="p">();</span>
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">prt</span><span class="p">();</span>
 
 <span class="cp">#endif
 </span></code></pre></td></tr></table>
 </div>
 </div><h2 id="编写makefileam">编写Makefile.am</h2>
 <p>回到项目中，工程个目录的<code>src</code>保存着项目的主体文件。<code>include</code>保存着头文件。</p>
-<p>Makefile.am</p>
+<p><code>Makefile.am</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -636,8 +686,8 @@
 <span class="nv">cbaincludedir</span> <span class="o">=</span> <span class="k">$(</span>includedir<span class="k">)</span>/abc
 <span class="nv">cbainclude_HEADERS</span> <span class="o">=</span> <span class="k">$(</span>conf_include_dir<span class="k">)</span>/abc/abc.h
 
-<span class="nv">helloincludedir</span> <span class="o">=</span> <span class="k">$(</span>includedir<span class="k">)</span>/hello
-<span class="nv">helloinclude_HEADERS</span> <span class="o">=</span> <span class="k">$(</span>conf_include_dir<span class="k">)</span>/hello/hello.h
+<span class="nv">prtincludedir</span> <span class="o">=</span> <span class="k">$(</span>includedir<span class="k">)</span>/prt
+<span class="nv">prtinclude_HEADERS</span> <span class="o">=</span> <span class="k">$(</span>conf_include_dir<span class="k">)</span>/prt/prt.h
 
 	<span class="c1"># nameincludedir</span>
 	<span class="c1"># nameinclude_HEADERS</span>
@@ -658,7 +708,7 @@
         
 </code></pre></td></tr></table>
 </div>
-</div><p>src/Makefile.am</p>
+</div><p><code>src/Makefile.am</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -671,14 +721,24 @@
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">bin_PROGRAMS</span><span class="o">=</span> hello
 	<span class="c1"># 前文叙述过，bin_PROGRAMS表示需要进行安装的二进制文件</span>
-<span class="nv">hello_SOURCES</span><span class="o">=</span> hello.c
+	
+<span class="nv">OBJECTS</span> <span class="o">=</span> <span class="k">$(</span>top_srcdir<span class="k">)</span>/src/abc/abc.c <span class="se">\
+</span><span class="se"></span>        <span class="k">$(</span>top_srcdir<span class="k">)</span>/src/prt/prt.c
+
+<span class="nv">hello_SOURCES</span><span class="o">=</span> hello.c <span class="k">$(</span>OBJECTS<span class="k">)</span>
 	<span class="c1"># 这里表示的是用于编译的文件</span>
 
-<span class="nv">AM_CPPFLAGS</span><span class="o">=</span>-I<span class="k">$(</span>top_srcdir<span class="k">)</span>/include
+<span class="nv">AM_CPPFLAGS</span><span class="o">=</span>    -I <span class="k">$(</span>top_srcdir<span class="k">)</span>/include <span class="se">\
+</span><span class="se"></span>                -I /home/zyjiang/tinyexpr
 	<span class="c1"># 还需要指明哪个是include目录。</span>
 	<span class="c1"># 需要注意的是，这里直接采用top_srcdir。</span>
 	<span class="c1"># 这个变量不建议在根目录使用</span>
@@ -687,7 +747,8 @@
 </div>
 </div><h2 id="执行autotool-操作">执行autotool 操作</h2>
 <p>1.<code>autoscan</code></p>
-<p>​	第一步就是执行autoscan操作，主要目的是扫描工作目录，并且生成configure.scan文件。这个configure.scan需要改为configure.ac然后修改其中的配置。</p>
+<pre><code>第一步就是执行autoscan操作，主要目的是扫描工作目录，并且生成configure.scan文件。这个configure.scan需要改为configure.ac然后修改其中的配置。
+</code></pre>
 <p>2.<code>mv configure.scan configure.in</code></p>
 <p>3.<code>vim configure.in</code></p>
 <div class="highlight"><div class="chroma">
@@ -757,15 +818,155 @@
 </span></code></pre></td></tr></table>
 </div>
 </div><p>4.<code>aclocal</code></p>
-<p>​	扫描configure.ac文件生成aclocal.m4文件，该文件主要用于处理本地的宏定义。</p>
+<pre><code>扫描configure.ac文件生成aclocal.m4文件，该文件主要用于处理本地的宏定义。
+</code></pre>
 <p>5.<code>autoconf</code></p>
-<p>​	将configure.ac的宏展开，生成configure脚本。</p>
+<pre><code>将configure.ac的宏展开，生成configure脚本。
+</code></pre>
 <p>6.<code>autoheader</code></p>
-<p>​	生成configure.h.in文件</p>
+<pre><code>生成configure.h.in文件
+</code></pre>
 <p>7.<code>automake --add-missing</code></p>
-<p>​	生成Makefile.in文件，&ndash;add-missing选项可以让automake自动添加一些必要的脚本文件，</p>
+<pre><code>生成Makefile.in文件，--add-missing选项可以让automake自动添加一些必要的脚本文件，
+</code></pre>
 <p>8.<code>configure</code></p>
-<p>​	可以运行configure命令，将Makefile.in生成Makefile了</p>
+<pre><code>可以运行configure命令，将Makefile.in生成Makefile了
+</code></pre>
+<h1 id="参考附录">参考附录</h1>
+<h2 id="configureac参数">configure.ac参数</h2>
+<table>
+<thead>
+<tr>
+<th>标签名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AC_PREREQ</td>
+<td>声明autoconf要求的版本号</td>
+</tr>
+<tr>
+<td>AC_INIT</td>
+<td>定义软件名称、版本号、联系方式</td>
+</tr>
+<tr>
+<td>AM_INIT_AUTOMAKE</td>
+<td>必须要的，指定编译参数</td>
+</tr>
+<tr>
+<td>AC_CONFIG_SRCDIR</td>
+<td>用来侦测所指定的源码文件是否存在, 来确定源码目录的有效性</td>
+</tr>
+<tr>
+<td>AC_CONFIG_HEADER</td>
+<td>指定产生的配置文件名称(一般是config.h),用于生成config.h文件，以便 autoheader 命令使用</td>
+</tr>
+<tr>
+<td>AC_PROG_CC</td>
+<td>用以探测当前系统的C编译器</td>
+</tr>
+<tr>
+<td>AC_PROG_RANLIB</td>
+<td>用于生成静态库</td>
+</tr>
+<tr>
+<td>AC_PROG_LIBTOOL</td>
+<td>用于生成动态库</td>
+</tr>
+<tr>
+<td>AM_PROG_AR</td>
+<td>生成静态库时使用，用于指定打包工具，一般指ar</td>
+</tr>
+<tr>
+<td>AC_CONFIG_FILES</td>
+<td>告知autoconf本工程生成哪些相应的Makefile文件，不同文件夹下的Makefile通过空格分隔</td>
+</tr>
+<tr>
+<td>AC_OUTPUT</td>
+<td>最后一个必须的宏,用以输出需要产生的文件</td>
+</tr>
+<tr>
+<td>AC_PROG_CXX</td>
+<td>用于探测系统的c++编译器</td>
+</tr>
+<tr>
+<td>AC_CHECK_LIB</td>
+<td>探测工程中出现的库文件及库文件中的方法</td>
+</tr>
+<tr>
+<td>AC_SUBST</td>
+<td>输出一个变量到由configure生成的文件中。</td>
+</tr>
+<tr>
+<td>AC_DEFINE</td>
+<td>定义预编译的宏 <code>AC_DEFINE(DEBUG)</code> or <code>AC_DEFINE(VERSION, &quot;2.3&quot;)</code></td>
+</tr>
+<tr>
+<td>AC_DEFINE_UNQUOTED</td>
+<td>AC_DEFINE_UNQUOTED(FOO, &ldquo;${some_variable}&quot;)  使用shell的扩展变量来定义预编译宏</td>
+</tr>
+<tr>
+<td>AC_CHECK_LIB</td>
+<td>AC_CHECK_LIB(ssl, SSL_new, [], [AC_MSG_ERROR([lib ssl not found])])检查某个库中是否有某个symbol</td>
+</tr>
+</tbody>
+</table>
+<h2 id="makefileam参数">Makefile.am参数</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>include_HEADERS</td>
+<td>标明哪些头文件将在执行make install命令之后被安装到系统include目录下</td>
+</tr>
+<tr>
+<td>bin_PROGRAMS</td>
+<td>生成的目标库文件名，如果有多个，用空格隔开，与configure.ac中AC_INIT对应库名对应</td>
+</tr>
+<tr>
+<td>XXX_SOURLDADDCES</td>
+<td>编译XXX库需要哪些源文件，使用相对路径</td>
+</tr>
+<tr>
+<td>XXX_LDADD</td>
+<td>指定要链接的静态库名称</td>
+</tr>
+<tr>
+<td>LIBS</td>
+<td>指定要链接的动态库名称</td>
+</tr>
+<tr>
+<td>INCLUDE</td>
+<td>一般指定要使用的头文件所在路径</td>
+</tr>
+<tr>
+<td>AUTOMAKE_OPTIONS</td>
+<td>设置automake的选项，automake提供了三种软件等级：foreign、gnu和gnits，当当前库文件编译所需源文件不在当前目录时要设置参数subdir-objects</td>
+</tr>
+<tr>
+<td>XXX_CPPFLAGS</td>
+<td>预处理器选项，编译选项，一般用来指定所需要头文件目录</td>
+</tr>
+<tr>
+<td>noinst_LIBRARIES</td>
+<td>指定生成的静态库名称，当前目录下源码及头文件最终生成的目标文件名</td>
+</tr>
+<tr>
+<td>AM_V_AR</td>
+<td>指定把目标打包成静态库，使用ar命令</td>
+</tr>
+<tr>
+<td>RANLIB</td>
+<td>指定为静态库创建索引，使用ranlib</td>
+</tr>
+</tbody>
+</table>
 
     </div>
 
